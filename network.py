@@ -417,6 +417,7 @@ class Network:
     
     def BetweennessCentrality(self):
         """ Calculate the betweenness centrality for all nodes. """
+        # i think this is an aproximation. Maybe calculate the proper value?
         CB = defaultdict(int)
         for i in self.nodes:
             distance, previous, paths, S = self.ShortestPaths(i)
@@ -430,10 +431,39 @@ class Network:
                 if w != i:
                     CB[w] += delta[w]
         
+        n = len(self.nodes)
+        for key in CB:
+            CB[key] *= 1 / ((n - 1) * (n - 2))
+
         return CB
     
-    def EigenvectorCentrality(self):
-        pass
+    def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
+        """ Calculate the Eigenvector centrality for all nodes. """
+        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
+        
+        traslationIn = {}
+
+        for i,n in enumerate(self.nodes):
+            traslationIn[n] = i
+
+        for i in self.nodes:
+            for j in self.nodes[i]:
+                M[traslationIn[i], traslationIn[j]] = 1
+
+        x = np.ones(shape=len(self.nodes))
+
+        for i in range(max_iter):
+            x_i = np.dot(M.T, x)
+
+            x_i /= np.linalg.norm(x_i)
+
+            if (np.sum(abs(x_i-x)) < epsilon):
+                print('converged')
+                break
+            #compare x and x_i
+            x = x_i
+
+        return dict(zip(self.nodes.keys(),x))
 
     #""" DRAWING STUFF """
     def DrawNetwork(self):
