@@ -476,13 +476,12 @@ class Network:
         c1 = 2
         c2 = 1
         c3 = 1
-        c4 = .01
+        c4 = .1
 
         ax = plt.gca()
         ax.set_facecolor((0.1, 0.1, 0.1))
-        
-        for i in range(1000):
 
+        for i in range(100):
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
@@ -493,21 +492,21 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    repulsion = c3/d**2
+                    repulsion = min(c3/d**2, 10)
+                    
 
-                    xForce = repulsion
+                    xForce = -repulsion
                     #x = x + c4*repulsion*math.cos((u-x)/d)
                     #y = y + c4*repulsion*math.sin((v-y)/d)
 
                     if n in self.Neighborhood(node):
-                        attraction = c1*math.log(d/c2)
+                        attraction = max(c1*math.log(d/c2),0)
                         xForce = attraction-repulsion
 
                     angle = math.atan2(v-y,u-x)
                     x = x + c4*xForce*math.cos(angle)
                     y = y + c4*xForce*math.sin(angle)
                         
-                #print("node:{}\n   original=({},{})\n   new=({},{})\n   delta({},{})\n".format(node,positions[node][0],positions[node][1],x,y,positions[node][0]-x,positions[node][1]-y))
                 positions[node] = [x,y]
 
         for n in self.nodes:
@@ -530,7 +529,7 @@ class Network:
         
     def _DrawLink(self, p1, p2, plot):
         
-        l = mlines.Line2D([p1[0], p2[0]], [p1[1], p2[1]], alpha=0.1,zorder=0)
+        l = mlines.Line2D([p1[0], p2[0]], [p1[1], p2[1]], alpha=.1,zorder=0)
         plot.add_line(l)
         return l
 
