@@ -150,7 +150,7 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("In-Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
@@ -172,7 +172,7 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("Out-Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
@@ -196,12 +196,34 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("Total Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
         return distribution
     
+    def ConditionalDegreeDistribution(self):
+        maxInDegree = 0
+        maxOutDegree = 0
+        for node in self.nodes:
+            maxInDegree = max(self.InDegree(node), maxInDegree)
+            maxOutDegree = max(self.OutDegree(node), maxOutDegree)
+
+        distribution = [0][0]*(maxDegree+1)
+
+        for node in self.nodes:
+            totalDegree = self.TotalDegree(node)
+            distribution[totalDegree] += 1
+        normalization = 1#sum(distribution)
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
+
+        plt.plot(range(0,len(distribution)), distribution)
+        plt.xlabel("Total Degree")
+        plt.ylabel("Fraction of Nodes")
+        plt.show()
+
+        return distribution
 
     def EdgeCount(self, verbose = 0):
         """ Returns the number of edges in the network """
