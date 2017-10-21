@@ -200,7 +200,7 @@ class Network:
                     self.nodes[i].add(i-gap*(size-1))
                     self.nodes[i-gap*(size-1)].add(i)
 
-    def CircularGraph():
+    def CircularGraph(self, n, k):
         """ create a circular graph """
         pass
 
