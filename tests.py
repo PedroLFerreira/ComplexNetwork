@@ -1,5 +1,12 @@
 from network import Network
 
 net = Network()
-net.Random(V = 10, p = .2, undirected=False)
+
+net.Load("undirected.txt")
 net.ShowNodes()
+print(net.Degree(2))
+
+net.Load("directed.txt")
+net.ShowNodes()
+print((net.InDegree(2),net.OutDegree(2)))
+

@@ -9,11 +9,11 @@ class Network:
     
     def __init__(self):
         self.nodes = defaultdict(set)
-        self.directed = False
 
     def Load(self, filename, length = None):
         """ Imports a list of edges to construct network. """
         file = open(filename, 'r')
+        self.nodes = defaultdict(set)
         listOfEdges = []
         if length != None:
             listOfEdges = [None]*length
@@ -28,14 +28,11 @@ class Network:
                 line = line.split()
                 line = [int(x) for x in line]
                 listOfEdges.append(line)
-
-        print(listOfEdges)
         self.Init(listOfEdges)
 
     def Save(self, filename):
         """ Saves network in edge list format. """
         file = open(filename,'w')
-
         print(self.nodes)
         for n in self.nodes:
             print (n)
@@ -47,19 +44,14 @@ class Network:
     def Init(self, listOfEdges ):
         """ Initializes graph from edge list. """
         for edge in listOfEdges:
-            #if edge[0] not in self.nodes:
-            #    self.nodes[edge[0]] = set()
             if edge[1] not in self.nodes:
                 self.nodes[edge[1]] = set()
-            
             self.nodes[edge[0]].add(edge[1])
 
 
     def ER_Random(self, V, p, undirected=False):
         """ Generates a ER random network with V vertices and probability p of edge occurrence. """
-
         t = time.clock()
-
         print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
         for n in range(V):
             self.nodes[n] = set()
@@ -86,9 +78,8 @@ class Network:
                     
 
     def AddEdge(self, fromNode, toNode):
-        """ Adds an edge between fromNode to toNode. ADD EXCEPTIONS!!!"""
+        """ Adds an edge between fromNode to toNode. """
         self.nodes[fromNode].add(toNode)
-        #self.nodes[toNode].add(fromNode)
 
 
     def ShowNodes(self):
@@ -100,33 +91,59 @@ class Network:
 
         
     def Degree(self, node):
-        """ Computes the degree of the node """
+        """ Computes the degree of the node. """
         if node in self.nodes:
             return len(self.nodes[node])
-        return -1
+        return None
+
+    def OutDegree(self, node):
+        """ Computes the in-degree of the node. """
+        if node in self.nodes:
+            return len(self.nodes[node])
+        return None
+    
+    def InDegree(self, node):
+        """ Computes the out-degree of the node. """
+        outdeg = 0
+        for n in self.nodes:
+            if node in self.nodes[n]:
+                outdeg += 1
+        return outdeg
 
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
     def DegreeDistribution(self):
-        """ Computes the degree distribution of the network and draws the plot """
+        """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
             maxDegree = max(self.Degree(node), maxDegree)
-        
+
         distribution = [0]*(maxDegree+1)
-        
+
         for node in self.nodes:
             degree = self.Degree(node)
             distribution[degree] += 1
         for d in range(0, len(distribution)):
             distribution[d] = distribution[d] / sum(distribution)
+        
         plt.plot(range(0,len(distribution)), distribution)
         plt.xlabel("Degree")
-        plt.ylabel("Frequency")
+        plt.ylabel("Fraction of Nodes")
         plt.show()
+
         return distribution
     
+    def InDegreeDistribution(self):
+        pass
+    
+    def OutDegreeDistribution(self):
+        pass
+
+    def TotalDegreeDistribution(self):
+        pass
+    
+
     def EdgeCount(self, verbose = 0):
         """ Returns the number of edges in the network """
         t = time.clock()
