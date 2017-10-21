@@ -15,4 +15,5 @@ for n in range(net.NodeCount()):
     print(str(n)+str((net.InDegree(n),net.OutDegree(n))))
 
 print(net.OutDegreeDistribution())
-#print(net.InDegreeDistribution())
+print(net.InDegreeDistribution())
+print(net.TotalDegreeDistribution())

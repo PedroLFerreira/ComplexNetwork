@@ -145,8 +145,9 @@ class Network:
         for node in self.nodes:
             degree = self.InDegree(node)
             distribution[degree] += 1
-        #for d in range(0, len(distribution)):
-            #distribution[d] = distribution[d] / sum(distribution)
+        normalization = sum(distribution)
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
         plt.xlabel("Degree")
@@ -166,8 +167,9 @@ class Network:
         for node in self.nodes:
             degree = self.OutDegree(node)
             distribution[degree] += 1
-        #for d in range(0, len(distribution)):
-            #distribution[d] = distribution[d] / sum(distribution)
+        normalization = sum(distribution)
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
         plt.xlabel("Degree")
@@ -176,8 +178,29 @@ class Network:
 
         return distribution
 
+    def TotalDegree(self, node):
+        return self.OutDegree(node) + self.InDegree(node)
+
     def TotalDegreeDistribution(self):
-        pass
+        maxDegree = 0
+        for node in self.nodes:
+            maxDegree = max(self.TotalDegree(node), maxDegree)
+
+        distribution = [0]*(maxDegree+1)
+
+        for node in self.nodes:
+            totalDegree = self.TotalDegree(node)
+            distribution[totalDegree] += 1
+        normalization = 1#sum(distribution)
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
+
+        plt.plot(range(0,len(distribution)), distribution)
+        plt.xlabel("Degree")
+        plt.ylabel("Fraction of Nodes")
+        plt.show()
+
+        return distribution
     
 
     def EdgeCount(self, verbose = 0):
