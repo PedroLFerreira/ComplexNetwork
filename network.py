@@ -183,7 +183,7 @@ class Network:
         return (len(diameterPath), diameterPath)
 
     def Lattice(self, shape, periodic=False):
-        """ periodic not working """
+        """ create a regular lattice network """
 
         nodeSizes = [1]
         for side in shape:
@@ -200,14 +200,9 @@ class Network:
                     self.nodes[i].add(i-gap*(size-1))
                     self.nodes[i-gap*(size-1)].add(i)
 
-        # for dim in shape:
-        #     for i in range(dim):
-        #         if i != dim-1:
-        #             self.nodes[i].add(i+1)
-        #             self.nodes[i+1].add(i)
-        #         elif periodic:
-        #             self.nodes[i].add(0)
-        #             self.nodes[0].add(i)
+    def CircularGraph():
+        """ create a circular graph """
+        pass
 
 
 #V = 10
