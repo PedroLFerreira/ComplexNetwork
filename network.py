@@ -48,8 +48,8 @@ class Network:
         for edge in listOfEdges:
             #if edge[0] not in self.nodes:
             #    self.nodes[edge[0]] = set()
-            #if edge[1] not in self.nodes:
-            #    self.nodes[edge[1]] = set()
+            if edge[1] not in self.nodes:
+                self.nodes[edge[1]] = set()
             
             self.nodes[edge[0]].add(edge[1])
 
