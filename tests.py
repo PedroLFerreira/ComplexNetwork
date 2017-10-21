@@ -5,8 +5,14 @@ net = Network()
 net.Load("undirected.txt")
 net.ShowNodes()
 print(net.Degree(2))
+net.DegreeDistribution()
+
 
 net.Load("directed.txt")
 net.ShowNodes()
-print((net.InDegree(2),net.OutDegree(2)))
 
+for n in range(net.NodeCount()):
+    print(str(n)+str((net.InDegree(n),net.OutDegree(n))))
+
+print(net.OutDegreeDistribution())
+#print(net.InDegreeDistribution())

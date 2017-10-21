@@ -44,9 +44,9 @@ class Network:
     def Init(self, listOfEdges ):
         """ Initializes graph from edge list. """
         for edge in listOfEdges:
+            self.nodes[edge[0]].add(edge[1])
             if edge[1] not in self.nodes:
                 self.nodes[edge[1]] = set()
-            self.nodes[edge[0]].add(edge[1])
 
 
     def ER_Random(self, V, p, undirected=False):
@@ -97,13 +97,13 @@ class Network:
         return None
 
     def OutDegree(self, node):
-        """ Computes the in-degree of the node. """
+        """ Computes the out-degree of the node. """
         if node in self.nodes:
             return len(self.nodes[node])
         return None
     
     def InDegree(self, node):
-        """ Computes the out-degree of the node. """
+        """ Computes the in-degree of the node. """
         outdeg = 0
         for n in self.nodes:
             if node in self.nodes[n]:
@@ -124,8 +124,9 @@ class Network:
         for node in self.nodes:
             degree = self.Degree(node)
             distribution[degree] += 1
+        normalization = sum(distribution)
         for d in range(0, len(distribution)):
-            distribution[d] = distribution[d] / sum(distribution)
+            distribution[d] = distribution[d] / normalization
         
         plt.plot(range(0,len(distribution)), distribution)
         plt.xlabel("Degree")
@@ -135,10 +136,45 @@ class Network:
         return distribution
     
     def InDegreeDistribution(self):
-        pass
+        maxDegree = 0
+        for node in self.nodes:
+            maxDegree = max(self.InDegree(node), maxDegree)
+
+        distribution = [0]*(maxDegree+1)
+
+        for node in self.nodes:
+            degree = self.InDegree(node)
+            distribution[degree] += 1
+        #for d in range(0, len(distribution)):
+            #distribution[d] = distribution[d] / sum(distribution)
+
+        plt.plot(range(0,len(distribution)), distribution)
+        plt.xlabel("Degree")
+        plt.ylabel("Fraction of Nodes")
+        plt.show()
+
+
+        return distribution
     
     def OutDegreeDistribution(self):
-        pass
+        maxDegree = 0
+        for node in self.nodes:
+            maxDegree = max(self.OutDegree(node), maxDegree)
+
+        distribution = [0]*(maxDegree+1)
+
+        for node in self.nodes:
+            degree = self.OutDegree(node)
+            distribution[degree] += 1
+        #for d in range(0, len(distribution)):
+            #distribution[d] = distribution[d] / sum(distribution)
+
+        plt.plot(range(0,len(distribution)), distribution)
+        plt.xlabel("Degree")
+        plt.ylabel("Fraction of Nodes")
+        plt.show()
+
+        return distribution
 
     def TotalDegreeDistribution(self):
         pass
