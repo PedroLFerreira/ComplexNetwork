@@ -4,6 +4,7 @@ import random
 import time
 import numpy as np
 import matplotlib.lines as mlines
+import math
 
 class Network:
     """ A network of nodes. """
@@ -75,8 +76,8 @@ class Network:
                 if((n+1)%(V/100)==0):
                     print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
         t = time.clock() - t
-        print("Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
-                    
+        print("ER-Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
+
 
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. """
@@ -90,7 +91,7 @@ class Network:
             print(str(node) + ":" + str(self.nodes[node]))
         print("===================\n")
 
-        
+
     def Degree(self, node):
         """ Computes the degree of the node. """
         if node in self.nodes:
@@ -405,17 +406,43 @@ class Network:
         ax = plt.gca()
         ax.set_facecolor((0.1, 0.1, 0.1))
         positions = defaultdict(set)
+
         for node in self.nodes:
             x,y = random.uniform(0, 100), random.uniform(0,100)
             positions[node] = [x,y]
-            ax.add_patch(self._DrawNode(x,y))
-        
+
+        c1 = 1
+        c2 = 1
+        c3 = 1
+        c4 = 1
+
+        for i in range(10):
+            for node in self.nodes:
+                x = positions[node][0]
+                y = positions[node][1]
+                for neighbor in self.nodes:
+                    u = positions[neighbor][0]
+                    v = positions[neighbor][1]
+                    d = math.sqrt((x-u)**2+(y-v)**2)
+                    if neighbor in neighborhood(node):
+                        attraction = c1*math.log(d/c2)
+                        x = x + attraction*math.cos((u-x)/d)
+                        y = y + attraction*math.sin((v-y)/d)
+
+                    else:
+                        repulsion = c3/d**2
+                        x = x + repulsion*math.cos((u-x)/d)
+                        y = y + repulsion*math.sin((v-y)/d)
+                    
+
+
+
         for n in self.nodes:
             for v in self.nodes[n]:
                 self._DrawLink(positions[n],positions[v], ax)
 
         for node in self.nodes:
-            ax.add_patch(self._DrawNode(x,y))
+            ax.add_patch(self._DrawNode(positions[node][0],positions[node][1]))
         
         ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
