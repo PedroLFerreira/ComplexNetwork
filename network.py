@@ -377,12 +377,7 @@ class Network:
         """ Calculate the closeness centrality for a given node.
             calculates using the path from node to target
         """
-        print("begin")
-        ans = 0
-
         distance, _ = self.ShortestPaths(node)
-
-        print(distance)
 
         total = 0
         for other in distance:
@@ -391,4 +386,17 @@ class Network:
             else:
                 total += distance[other]
 
-        return (len(self.nodes)-1)/total
+        return (len(self.nodes) - 1) / total
+
+    def HarmonicCentrality(self, node):
+        """ Calculate the harmonics centrality for a given node. """
+        distance, _ = self.ShortestPaths(node)
+
+        total = 0
+        for other in distance:
+            if distance[other] == -1 or other == node:
+                continue
+            else: 
+                total += 1/distance[other]
+
+        return total / (len(self.nodes) - 1)
