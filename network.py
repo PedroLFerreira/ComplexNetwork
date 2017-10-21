@@ -262,7 +262,7 @@ class Network:
         return visited
     
     def ShortestPath(self, start, goal):
-        """ Returns shortest path from start to goal"""
+        """ Returns shortest path from start to goal. """
         queue = [(start, [start])]
         while queue:
             (node, path) = queue.pop(0)
@@ -346,4 +346,24 @@ class Network:
                 else:
                     self.nodes[i].add(i+j)
                     self.nodes[i+j].add(i)
+
+    def ClosenessCentrality(self, node):
+        """ Calculate the closeness centrality for a given node.
+            calculates using the path from node to target
+        """
+        print("begin")
+        ans = 0
+        for i in self.nodes:
+            if i == node:
+                continue
+            path = self.ShortestPath(node, i)
+            if path == None:
+                print(node, i)
+                return 0
+            ans += len(path)
+        
+        print(ans)
+
+        return 1/ans
+
 
