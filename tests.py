@@ -16,3 +16,7 @@ for n in range(net.NodeCount()):
 
 print(net.OutDegreeDistribution())
 #print(net.InDegreeDistribution())
+
+net.CircularGraph(20, 3)
+net.ShowNodes()
+print(net.AvClusteringCoefficient())
