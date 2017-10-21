@@ -8,6 +8,41 @@ class Network:
     def __init__(self):
         self.nodes = {}
 
+
+    def Load(self, filename, length=4):
+        """ Imports a list of edges to construct network. """
+        file = open(filename, 'r')
+        listOfEdges = []
+        if length != None:
+            listOfEdges = [None]*length
+            i=0
+            for line in file:
+                line = line.split()
+                line = [int(x) for x in line]
+                listOfEdges[i] = line
+                i+=1
+        else:
+            for line in file:
+                line = line.split()
+                line = [int(x) for x in line]
+                listOfEdges.append(line)
+
+        print(listOfEdges)
+        self.Init(listOfEdges)
+
+    def Save(self, filename):
+        """ Saves network in edge list format. """
+
+        file = open(filename,'w')
+
+        print(self.nodes)
+        for n in self.nodes:
+            print (n)
+            for v in self.nodes[n]:
+                print(' '+str(v))
+                file.write(str(n)+" "+str(v)+"\n")
+                
+
     def Init(self, listOfEdges ):
         """ Initializes graph from edge list. """
         for edge in listOfEdges:
@@ -17,7 +52,6 @@ class Network:
                 self.nodes[edge[1]] = set()
             
             self.nodes[edge[0]].add(edge[1])
-            self.nodes[edge[1]].add(edge[0])
 
 
     def Random(self, V, p):
@@ -150,7 +184,6 @@ class Network:
 #V = 10
 #p = 0.1
 
-#net = Network()
 
 #net.Random(V, p)
 #net.Init([[0,1],[0,2],[1,3],[4,5]])

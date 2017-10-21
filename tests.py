@@ -1,7 +1,6 @@
 from network import *
 
 net = Network()
-
-net.Random(V = 10, p = .2)
-
+net.Load('edgeList.txt')
 net.ShowNodes()
+net.Save('newEdgeList.txt')
