@@ -265,6 +265,29 @@ class Network:
                     diameterPath = short
         return (len(diameterPath), diameterPath)
 
+    def ClusteringCoefficient(self, node):
+        """ Calculate the clustering Coefficient of a node"""
+        # does this work for directional networks?
+        coefficient = 0
+
+        # checks everythin 2x, dunno how to be more efficient with sets
+        for neibourgh1 in self.nodes[node]:
+            for neibourgh2 in self.nodes[node]:
+                if neibourgh2 in self.nodes[neibourgh1]:
+                    coefficient += 1
+        l = len(self.nodes[node])
+        if l > 1:
+            coefficient /= (l * (l - 1))
+        
+        return coefficient
+
+    def AvClusteringCoefficient(self):
+        """ Calculate the average clustering Coefficient"""
+        # does this work for directional networks?
+        coefficients = [self.ClusteringCoefficient(i) for i in range(len(self.nodes))]
+        
+        return sum(coefficients) / len(self.nodes)
+
     def Lattice(self, shape, periodic=False):
         """ create a regular lattice network """
 
