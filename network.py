@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 import random
 import time
+import numpy as np
 
 
 class Network:
@@ -208,21 +209,22 @@ class Network:
         for node in self.nodes:
             maxInDegree = max(self.InDegree(node), maxInDegree)
             maxOutDegree = max(self.OutDegree(node), maxOutDegree)
+        distribution = np.zeros((maxInDegree + 1,maxOutDegree + 1))
 
-        distribution = [0][0]*(maxDegree+1)
-
+        print(np.shape(distribution))
         for node in self.nodes:
-            totalDegree = self.TotalDegree(node)
-            distribution[totalDegree] += 1
-        normalization = 1#sum(distribution)
-        for d in range(0, len(distribution)):
-            distribution[d] = distribution[d] / normalization
+            inDegree = self.InDegree(node)
+            outDegree = self.OutDegree(node)
+            distribution[inDegree, outDegree] += 1
+        normalization = np.sum(distribution)
+        for i in range(0, len(distribution)):
+            for o in range(0, len(distribution[0])):
+                distribution[i, o] = distribution[i, o] / normalization
 
-        plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Total Degree")
-        plt.ylabel("Fraction of Nodes")
+        plt.xlabel("In-Degree")
+        plt.ylabel("Out-Degree")
+        plt.imshow(distribution)
         plt.show()
-
         return distribution
 
     def EdgeCount(self, verbose = 0):
