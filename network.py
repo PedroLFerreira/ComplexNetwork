@@ -284,7 +284,7 @@ class Network:
     def AvClusteringCoefficient(self):
         """ Calculate the average clustering Coefficient"""
         # does this work for directional networks?
-        coefficients = [self.ClusteringCoefficient(i) for i in range(len(self.nodes))]
+        coefficients = [self.ClusteringCoefficient(i) for i in self.nodes]
         
         return sum(coefficients) / len(self.nodes)
 
@@ -307,7 +307,10 @@ class Network:
                     self.nodes[i-gap*(size-1)].add(i)
 
     def CircularGraph(self, n, k):
-        """ create a circular graph """
+        """ create a circular graph 
+            k is the number of closest neibourgh, so the <k> of the 
+            network generated will be <k>=2k
+        """
 
         self.nodes = defaultdict(set)
         
