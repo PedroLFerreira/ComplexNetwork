@@ -223,7 +223,7 @@ class Network:
 
         plt.xlabel("In-Degree")
         plt.ylabel("Out-Degree")
-        plt.imshow(distribution)
+        plt.imshow(distribution,origin=(0,0))
         plt.show()
         return distribution
 
