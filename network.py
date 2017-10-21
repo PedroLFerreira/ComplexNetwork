@@ -111,6 +111,15 @@ class Network:
                 outdeg += 1
         return outdeg
 
+    def Neiborghs(self, node):
+        """ Return the first neiborghs of the node. """
+        neiborghs = set()
+        for n in self.nodes:
+            if node in self.nodes[n]:
+                neiborghs.add(n)
+        
+        return neiborghs | self.nodes[node]
+
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
@@ -286,8 +295,8 @@ class Network:
         S = []
 
         previous = defaultdict(list)
-        sigma = defaultdict(int)
-        sigma[start] = 1
+        paths = defaultdict(int)
+        paths[start] = 1
 
         currentLayer = [start]
         depth = 0
@@ -300,13 +309,13 @@ class Network:
             for i in currentLayer:
                 for neiborgh in self.nodes[i]:
                     if distance[neiborgh] == -1:
-                        sigma[neiborgh] += sigma[i]
+                        paths[neiborgh] += paths[i]
                         nextLayer.append(neiborgh)
                         previous[neiborgh].append(i)
             depth += 1
             currentLayer = nextLayer
 
-        return distance, previous, sigma, S
+        return distance, previous, paths, S
 
 
     def Diameter(self):
@@ -393,7 +402,7 @@ class Network:
                 total += distance[other]
 
         return (len(self.nodes) - 1) / total
-
+    
     def HarmonicCentrality(self, node):
         """ Calculate the harmonic centrality for a given node. """
         distance, _, _, _ = self.ShortestPaths(node)
@@ -410,18 +419,21 @@ class Network:
         """ Calculate the betweenness centrality for all nodes. """
         CB = defaultdict(int)
         for i in self.nodes:
-            distance, previous, sigma, S = self.ShortestPaths(i)
+            distance, previous, paths, S = self.ShortestPaths(i)
 
             delta = defaultdict(int)
 
             while len(S) != 0:
                 w = S.pop()
                 for v in previous[w]:
-                    delta[v] += sigma[v]/sigma[w]*(1 + delta[w])
+                    delta[v] += paths[v]/paths[w]*(1 + delta[w])
                 if w != i:
                     CB[w] += delta[w]
         
         return CB
+    
+    def EigenvectorCentrality(self):
+        pass
 
     #""" DRAWING STUFF """
     def DrawNetwork(self):
