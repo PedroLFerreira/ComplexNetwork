@@ -283,24 +283,30 @@ class Network:
         for i in self.nodes:
             distance[i] = -1
 
+        S = []
+
         previous = defaultdict(list)
+        sigma = defaultdict(int)
+        sigma[start] = 1
 
         currentLayer = [start]
         depth = 0
 
         while len(currentLayer) != 0:
+            S += currentLayer
             nextLayer = []
             for i in currentLayer:
                 distance[i] = depth
             for i in currentLayer:
-                for neibourgh in self.nodes[i]:
-                    if distance[neibourgh] == -1:
-                        nextLayer.append(neibourgh)
-                        previous[neibourgh].append(i)
+                for neiborgh in self.nodes[i]:
+                    if distance[neiborgh] == -1:
+                        sigma[neiborgh] += sigma[i]
+                        nextLayer.append(neiborgh)
+                        previous[neiborgh].append(i)
             depth += 1
             currentLayer = nextLayer
 
-        return distance, previous            
+        return distance, previous, sigma, S
 
 
     def Diameter(self):
@@ -321,9 +327,9 @@ class Network:
         coefficient = 0
 
         # checks everythin 2x, dunno how to be more efficient with sets
-        for neibourgh1 in self.nodes[node]:
-            for neibourgh2 in self.nodes[node]:
-                if neibourgh2 in self.nodes[neibourgh1]:
+        for neiborgh1 in self.nodes[node]:
+            for neiborgh2 in self.nodes[node]:
+                if neiborgh2 in self.nodes[neiborgh1]:
                     coefficient += 1
         l = len(self.nodes[node])
         if l > 1:
@@ -358,7 +364,7 @@ class Network:
 
     def CircularGraph(self, n, k):
         """ create a circular graph 
-            k is the number of closest neibourgh, so the <k> of the 
+            k is the number of closest neiborgh, so the <k> of the 
             network generated will be <k>=2k
         """
 
@@ -377,7 +383,7 @@ class Network:
         """ Calculate the closeness centrality for a given node.
             calculates using the path from node to target
         """
-        distance, _ = self.ShortestPaths(node)
+        distance, _, _, _ = self.ShortestPaths(node)
 
         total = 0
         for other in distance:
@@ -389,8 +395,8 @@ class Network:
         return (len(self.nodes) - 1) / total
 
     def HarmonicCentrality(self, node):
-        """ Calculate the harmonics centrality for a given node. """
-        distance, _ = self.ShortestPaths(node)
+        """ Calculate the harmonic centrality for a given node. """
+        distance, _, _, _ = self.ShortestPaths(node)
 
         total = 0
         for other in distance:
@@ -399,6 +405,23 @@ class Network:
             else: 
                 total += 1/distance[other]
         return total / (len(self.nodes) - 1)
+    
+    def BetweennessCentrality(self):
+        """ Calculate the betweenness centrality for all nodes. """
+        CB = defaultdict(int)
+        for i in self.nodes:
+            distance, previous, sigma, S = self.ShortestPaths(i)
+
+            delta = defaultdict(int)
+
+            while len(S) != 0:
+                w = S.pop()
+                for v in previous[w]:
+                    delta[v] += sigma[v]/sigma[w]*(1 + delta[w])
+                if w != i:
+                    CB[w] += delta[w]
+        
+        return CB
 
     #""" DRAWING STUFF """
     def DrawNetwork(self):
