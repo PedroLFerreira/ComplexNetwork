@@ -51,8 +51,8 @@ class Network:
     def ShowNodes(self):
         """ Prints adjacency list to the console """
         print("\n=======NODES=======")
-        for node in net.nodes:
-            print(str(node) + ":" + str(net.nodes[node]))
+        for node in self.nodes:
+            print(str(node) + ":" + str(self.nodes[node]))
         print("===================\n")
 
         
@@ -113,7 +113,7 @@ class Network:
         visited, queue = set(), [start]
         while queue:
             node = queue.pop(0)
-            if vertex not in visited:
+            if node not in visited:
                 visited.add(node)
                 queue.extend(self.nodes[node] - visited)
         return visited
@@ -122,9 +122,9 @@ class Network:
         """ Returns shortest path from start to goal"""
         queue = [(start, [start])]
         while queue:
-            (vertex, path) = queue.pop(0)
-            if self.nodes[vertex]-set(path) != set():
-                for next in self.nodes[vertex]-set(path):
+            (node, path) = queue.pop(0)
+            if self.nodes[node]-set(path) != set():
+                for next in self.nodes[node]-set(path):
                     if next == set():
                         continue
                     if next == goal:
@@ -147,14 +147,14 @@ class Network:
         return (len(diameterPath), diameterPath)
 
 
-V = 10
-p = 0.1
+#V = 10
+#p = 0.1
 
-net = Network()
+#net = Network()
 
-net.Random(V, p)
+#net.Random(V, p)
 #net.Init([[0,1],[0,2],[1,3],[4,5]])
-net.ShowNodes()
+#net.ShowNodes()
 
 #degDist = net.DegreeDistribution()
-print("Diameter={}\nLongest Shortest Path:{}".format(net.Diameter()[0],net.Diameter()[1]))
+#print("Diameter={}\nLongest Shortest Path:{}".format(net.Diameter()[0],net.Diameter()[1]))
