@@ -473,15 +473,16 @@ class Network:
             x,y = random.uniform(0, 10), random.uniform(0,10)
             positions[node] = [x,y]
 
-        c1 = 1
+        c1 = 2
         c2 = 1
         c3 = 1
-        c4 = .1
+        c4 = .01
 
         ax = plt.gca()
         ax.set_facecolor((0.1, 0.1, 0.1))
-
+        
         for i in range(1000):
+
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
@@ -492,16 +493,21 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    #repulsion = c3/d**2
+                    repulsion = c3/d**2
+
+                    xForce = repulsion
                     #x = x + c4*repulsion*math.cos((u-x)/d)
                     #y = y + c4*repulsion*math.sin((v-y)/d)
 
                     if n in self.Neighborhood(node):
                         attraction = c1*math.log(d/c2)
-                        x = x - c4*attraction*math.cos((u-x)/d)
-                        y = y + c4*attraction*math.sin((v-y)/d)
+                        xForce = attraction-repulsion
+
+                    angle = math.atan2(v-y,u-x)
+                    x = x + c4*xForce*math.cos(angle)
+                    y = y + c4*xForce*math.sin(angle)
                         
-                print("node:{}\n   original=({},{})\n   new=({},{})\n   delta({},{})\n".format(node,positions[node][0],positions[node][1],x,y,positions[node][0]-x,positions[node][1]-y))
+                #print("node:{}\n   original=({},{})\n   new=({},{})\n   delta({},{})\n".format(node,positions[node][0],positions[node][1],x,y,positions[node][0]-x,positions[node][1]-y))
                 positions[node] = [x,y]
 
         for n in self.nodes:
