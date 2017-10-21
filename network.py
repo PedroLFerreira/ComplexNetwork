@@ -9,6 +9,7 @@ class Network:
     
     def __init__(self):
         self.nodes = defaultdict(set)
+        self.directed = False
 
     def Load(self, filename, length = None):
         """ Imports a list of edges to construct network. """
@@ -46,21 +47,17 @@ class Network:
     def Init(self, listOfEdges ):
         """ Initializes graph from edge list. """
         for edge in listOfEdges:
-            #if edge[0] not in self.nodes:
-            #    self.nodes[edge[0]] = set()
-            #if edge[1] not in self.nodes:
-            #    self.nodes[edge[1]] = set()
-            
             self.nodes[edge[0]].add(edge[1])
 
 
-    def Random(self, V, p, undirected=False):
+    def ER_Random(self, V, p, undirected=False):
         """ Generates a ER random network with V vertices and probability p of edge occurrence. """
 
         t = time.clock()
 
         print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
         for n in range(V):
+            self.nodes[n] = set()
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
