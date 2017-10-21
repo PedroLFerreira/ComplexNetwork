@@ -10,7 +10,6 @@ class Network:
     def __init__(self):
         self.nodes = defaultdict(set)
 
-
     def Load(self, filename, length=4):
         """ Imports a list of edges to construct network. """
         file = open(filename, 'r')
@@ -34,7 +33,6 @@ class Network:
 
     def Save(self, filename):
         """ Saves network in edge list format. """
-
         file = open(filename,'w')
 
         print(self.nodes)
@@ -56,22 +54,22 @@ class Network:
             self.nodes[edge[0]].add(edge[1])
 
 
-    def Random(self, V, p):
+    def Random(self, V, p, undirected=False):
         """ Generates a ER random network with V vertices and probability p of edge occurrence. """
 
         t = time.clock()
 
         print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
         for n in range(V):
-            #self.nodes[n] = set()
-            #print(str(n)+"%"+str(5)+"="+str(n%5))
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
         for n in range(V):
             for v in range(n,V):
                 if(v != n and random.uniform(0,1) < p):
-                    self.AddEdge(v,n)
+                    self.AddEdge(v, n)
+                    if undirected:
+                        self.AddEdge(n, v)
             if((n+1)%(V/100)==0):
                 print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
         t = time.clock() - t
@@ -81,7 +79,7 @@ class Network:
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. ADD EXCEPTIONS!!!"""
         self.nodes[fromNode].add(toNode)
-        self.nodes[toNode].add(fromNode)
+        #self.nodes[toNode].add(fromNode)
 
 
     def ShowNodes(self):
@@ -209,14 +207,3 @@ class Network:
         #             self.nodes[i].add(0)
         #             self.nodes[0].add(i)
 
-
-#V = 10
-#p = 0.1
-
-
-#net.Random(V, p)
-#net.Init([[0,1],[0,2],[1,3],[4,5]])
-#net.ShowNodes()
-
-#degDist = net.DegreeDistribution()
-#print("Diameter={}\nLongest Shortest Path:{}".format(net.Diameter()[0],net.Diameter()[1]))
