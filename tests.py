@@ -11,3 +11,6 @@ net = Network()
 net.Lattice(shape = [5, 5], periodic=True)
 
 net.ShowNodes()
+net.Load('edgeList.txt')
+net.ShowNodes()
+net.Save('newEdgeList.txt')
