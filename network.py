@@ -3,7 +3,7 @@ from collections import defaultdict
 import random
 import time
 import numpy as np
-
+import matplotlib.lines as mlines
 
 class Network:
     """ A network of nodes. """
@@ -365,5 +365,64 @@ class Network:
         print(ans)
 
         return 1/ans
+
+
+
+    #""" DRAWING STUFF """
+    def DrawNetwork(self):
+        ax = plt.gca()
+        for node in self.nodes:
+            x,y = random.uniform(0, 10), random.uniform(0,10)
+            ax.add_patch(self._DrawNode(x,y))
+
+        plt.axis('scaled')
+        plt.show()
+
+    def _DrawNode(self, x, y):
+        node = plt.Circle((x, y), radius = .1)
+        return node
+        
+    def _DrawLink(self, p1, p2):
+        ax = plt.gca()
+        l = mlines.Line2D([p1[0], p1[1]], [p2[0], p2[1]])
+        ax.add_line(l)
+        return l
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
