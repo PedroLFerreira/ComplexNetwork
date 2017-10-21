@@ -403,21 +403,32 @@ class Network:
     #""" DRAWING STUFF """
     def DrawNetwork(self):
         ax = plt.gca()
+        ax.set_facecolor((0.1, 0.1, 0.1))
+        positions = defaultdict(set)
         for node in self.nodes:
-            x,y = random.uniform(0, 10), random.uniform(0,10)
+            x,y = random.uniform(0, 100), random.uniform(0,100)
+            positions[node] = [x,y]
             ax.add_patch(self._DrawNode(x,y))
+        
+        for n in self.nodes:
+            for v in self.nodes[n]:
+                self._DrawLink(positions[n],positions[v], ax)
 
+        for node in self.nodes:
+            ax.add_patch(self._DrawNode(x,y))
+        
+        ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
         plt.show()
 
     def _DrawNode(self, x, y):
-        node = plt.Circle((x, y), radius = .1)
+        node = plt.Circle((x, y), radius = .1, color = (1,1,1))
         return node
         
-    def _DrawLink(self, p1, p2):
-        ax = plt.gca()
-        l = mlines.Line2D([p1[0], p1[1]], [p2[0], p2[1]])
-        ax.add_line(l)
+    def _DrawLink(self, p1, p2, plot):
+        
+        l = mlines.Line2D([p1[0], p2[0]], [p1[1], p2[1]], alpha=0.1,zorder=0)
+        plot.add_line(l)
         return l
 
 
