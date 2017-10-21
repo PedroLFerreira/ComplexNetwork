@@ -112,14 +112,14 @@ class Network:
                 outdeg += 1
         return outdeg
 
-    def Neiborghs(self, node):
-        """ Return the first neiborghs of the node. """
-        neiborghs = set()
+    def Neighborhood(self, node):
+        """ Returns the first neighbors of the node. """
+        inNeighbors = set()
         for n in self.nodes:
             if node in self.nodes[n]:
-                neiborghs.add(n)
+                inNeighbors.add(n)
         
-        return neiborghs | self.nodes[node]
+        return inNeighbors | self.nodes[node]
 
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
@@ -438,39 +438,41 @@ class Network:
 
     #""" DRAWING STUFF """
     def DrawNetwork(self):
-        ax = plt.gca()
-        ax.set_facecolor((0.1, 0.1, 0.1))
         positions = defaultdict(set)
-
         for node in self.nodes:
-            x,y = random.uniform(0, 100), random.uniform(0,100)
+            x,y = random.uniform(0, 10), random.uniform(0,10)
             positions[node] = [x,y]
 
         c1 = 1
         c2 = 1
         c3 = 1
-        c4 = 1
+        c4 = .1
 
-        for i in range(10):
+        ax = plt.gca()
+        ax.set_facecolor((0.1, 0.1, 0.1))
+
+        for i in range(1000):
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
-                for neighbor in self.nodes:
-                    u = positions[neighbor][0]
-                    v = positions[neighbor][1]
+                for n in self.nodes:
+                    if n==node:
+                        continue
+                    u = positions[n][0]
+                    v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
-                    if neighbor in neighborhood(node):
-                        attraction = c1*math.log(d/c2)
-                        x = x + attraction*math.cos((u-x)/d)
-                        y = y + attraction*math.sin((v-y)/d)
-
-                    else:
-                        repulsion = c3/d**2
-                        x = x + repulsion*math.cos((u-x)/d)
-                        y = y + repulsion*math.sin((v-y)/d)
                     
+                    #repulsion = c3/d**2
+                    #x = x + c4*repulsion*math.cos((u-x)/d)
+                    #y = y + c4*repulsion*math.sin((v-y)/d)
 
-
+                    if n in self.Neighborhood(node):
+                        attraction = c1*math.log(d/c2)
+                        x = x - c4*attraction*math.cos((u-x)/d)
+                        y = y + c4*attraction*math.sin((v-y)/d)
+                        
+                print("node:{}\n   original=({},{})\n   new=({},{})\n   delta({},{})\n".format(node,positions[node][0],positions[node][1],x,y,positions[node][0]-x,positions[node][1]-y))
+                positions[node] = [x,y]
 
         for n in self.nodes:
             for v in self.nodes[n]:
@@ -479,9 +481,12 @@ class Network:
         for node in self.nodes:
             ax.add_patch(self._DrawNode(positions[node][0],positions[node][1]))
         
-        ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
+        #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
         plt.show()
+
+
+
 
     def _DrawNode(self, x, y):
         node = plt.Circle((x, y), radius = .1, color = (1,1,1))
