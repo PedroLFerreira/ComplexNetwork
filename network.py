@@ -10,7 +10,7 @@ class Network:
     def __init__(self):
         self.nodes = defaultdict(set)
 
-    def Load(self, filename, length=4):
+    def Load(self, filename, length = None):
         """ Imports a list of edges to construct network. """
         file = open(filename, 'r')
         listOfEdges = []
@@ -64,14 +64,21 @@ class Network:
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
-        for n in range(V):
-            for v in range(n,V):
-                if(v != n and random.uniform(0,1) < p):
-                    self.AddEdge(v, n)
-                    if undirected:
+        if undirected:
+            for n in range(V):
+                for v in range(n,V):
+                    if(v != n and random.uniform(0,1) < p):
+                        self.AddEdge(v, n)
                         self.AddEdge(n, v)
-            if((n+1)%(V/100)==0):
-                print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
+                if((n+1)%(V/100)==0):
+                    print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
+        else:
+            for n in range(V):
+                for v in range(V):
+                    if(v != n and random.uniform(0,1) < p):
+                        self.AddEdge(v, n)
+                if((n+1)%(V/100)==0):
+                    print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
         t = time.clock() - t
         print("Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
                     
