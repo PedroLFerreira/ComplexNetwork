@@ -473,10 +473,10 @@ class Network:
             x,y = random.uniform(0, 10), random.uniform(0,10)
             positions[node] = [x,y]
 
-        c1 = 2
-        c2 = 1
-        c3 = 1
-        c4 = .1
+        attractionMultiplier = 2
+        restLength = .1
+        repulsionMultiplier = 1
+        forceMultiplier = .1
 
         ax = plt.gca()
         ax.set_facecolor((0.1, 0.1, 0.1))
@@ -492,20 +492,17 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    repulsion = min(c3/d**2, 10)
-                    
+                    repulsion = min(repulsionMultiplier/d**2, 10)
 
                     xForce = -repulsion
-                    #x = x + c4*repulsion*math.cos((u-x)/d)
-                    #y = y + c4*repulsion*math.sin((v-y)/d)
 
                     if n in self.Neighborhood(node):
-                        attraction = max(c1*math.log(d/c2),0)
+                        attraction = max(attractionMultiplier*math.log(d/restLength),0)
                         xForce = attraction-repulsion
 
                     angle = math.atan2(v-y,u-x)
-                    x = x + c4*xForce*math.cos(angle)
-                    y = y + c4*xForce*math.sin(angle)
+                    x = x + forceMultiplier*xForce*math.cos(angle)
+                    y = y + forceMultiplier*xForce*math.sin(angle)
                         
                 positions[node] = [x,y]
 
@@ -514,7 +511,8 @@ class Network:
                 self._DrawLink(positions[n],positions[v], ax)
 
         for node in self.nodes:
-            ax.add_patch(self._DrawNode(positions[node][0],positions[node][1]))
+            fltr = self.HarmonicCentrality(node)
+            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = (0.2*fltr+0.8,0.2,0.9*fltr+0.1) ))
         
         #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
@@ -523,8 +521,8 @@ class Network:
 
 
 
-    def _DrawNode(self, x, y):
-        node = plt.Circle((x, y), radius = .1, color = (1,1,1))
+    def _DrawNode(self, x, y, radius = 0.1, color = (0.960784, 0.968627, 0.886275)):
+        node = plt.Circle((x, y), radius = radius, color = color)
         return node
         
     def _DrawLink(self, p1, p2, plot):

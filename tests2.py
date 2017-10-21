@@ -4,7 +4,7 @@ import numpy as np
 from collections import defaultdict
 
 net = Network()
-net.ER_Random(100,.1)
+net.ER_Random(50,.02)
 #net.Load("undirected.txt")
 net.DrawNetwork()
 
