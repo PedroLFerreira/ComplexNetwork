@@ -213,6 +213,8 @@ class Network:
         for side in shape:
             nodeSizes.append(side*nodeSizes[-1])
 
+        self.nodes = defaultdict(set)
+
         for i in range(nodeSizes[-1]):
             for (gap, size) in zip(nodeSizes, shape):
                 if (i // gap) % size != size-1:
@@ -224,6 +226,9 @@ class Network:
 
     def CircularGraph(self, n, k):
         """ create a circular graph """
+
+        self.nodes = defaultdict(set)
+        
         for i in range(n):
             for j in range(1, k):
                 if i+j > n-1:
