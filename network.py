@@ -1,14 +1,12 @@
 import matplotlib.pyplot as plt
-from collections import defaultdict
 import random
 import time
-
 
 class Network:
     """ A network of nodes. """
     
     def __init__(self):
-        self.nodes = defaultdict(set)
+        self.nodes = {}
 
 
     def Load(self, filename, length=4):
@@ -34,25 +32,20 @@ class Network:
 
     def Save(self, filename):
         """ Saves network in edge list format. """
-
         file = open(filename,'w')
 
-        print(self.nodes)
         for n in self.nodes:
-            print (n)
             for v in self.nodes[n]:
-                print(' '+str(v))
                 file.write(str(n)+" "+str(v)+"\n")
                 
 
     def Init(self, listOfEdges ):
         """ Initializes graph from edge list. """
         for edge in listOfEdges:
-            #if edge[0] not in self.nodes:
-            #    self.nodes[edge[0]] = set()
-            #if edge[1] not in self.nodes:
-            #    self.nodes[edge[1]] = set()
-            
+            if edge[0] not in self.nodes:
+                self.nodes[edge[0]] = set()
+            if edge[1] not in self.nodes:
+                self.nodes[edge[1]] = set()
             self.nodes[edge[0]].add(edge[1])
 
 
@@ -63,7 +56,7 @@ class Network:
 
         print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
         for n in range(V):
-            #self.nodes[n] = set()
+            self.nodes[n] = set()
             #print(str(n)+"%"+str(5)+"="+str(n%5))
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
@@ -73,7 +66,7 @@ class Network:
                 if(v != n and random.uniform(0,1) < p):
                     self.AddEdge(v,n)
             if((n+1)%(V/100)==0):
-                print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
+                print("      Edge Progress: {:.1f}%".format((n+1)/V*100))
         t = time.clock() - t
         print("Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
                     
@@ -129,7 +122,7 @@ class Network:
             E += len(self.nodes[n])
 
             if((n+1)%(len(self.nodes)/50)==0 and verbose == 1):
-                print("Counting edges: {:.1f}%\r".format((n+1)/len(self.nodes)*100))
+                print("Counting edges: {:.1f}%".format((n+1)/len(self.nodes)*100))
         t = time.clock() - t
         print("EdgeCount took {:.5f} seconds.".format(t))
         return E/2
@@ -181,33 +174,6 @@ class Network:
                 if short != None and len(short) > len(diameterPath):
                     diameterPath = short
         return (len(diameterPath), diameterPath)
-
-    def Lattice(self, shape, periodic=False):
-        """ periodic not working """
-
-        nodeSizes = [1]
-        for side in shape:
-            nodeSizes.append(side*nodeSizes[-1])
-        
-        print(list(zip(nodeSizes, shape)))
-
-        for i in range(nodeSizes[-1]):
-            for (gap, size) in zip(nodeSizes, shape):
-                if (i // gap) % size != size-1:
-                    self.nodes[i].add(i+gap)
-                    self.nodes[i+gap].add(i)
-                elif periodic:
-                    self.nodes[i].add(i-gap*(size-1))
-                    self.nodes[i-gap*(size-1)].add(i)
-
-        # for dim in shape:
-        #     for i in range(dim):
-        #         if i != dim-1:
-        #             self.nodes[i].add(i+1)
-        #             self.nodes[i+1].add(i)
-        #         elif periodic:
-        #             self.nodes[i].add(0)
-        #             self.nodes[0].add(i)
 
 
 #V = 10
