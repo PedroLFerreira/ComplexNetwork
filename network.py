@@ -277,6 +277,32 @@ class Network:
             else:
                 break
     
+    def ShortestPaths(self, start):
+        """ Distances and shortest paths from start to the other nodes """
+        distance = {}
+        for i in self.nodes:
+            distance[i] = -1
+
+        previous = defaultdict(list)
+
+        currentLayer = [start]
+        depth = 0
+
+        while len(currentLayer) != 0:
+            nextLayer = []
+            for i in currentLayer:
+                distance[i] = depth
+            for i in currentLayer:
+                for neibourgh in self.nodes[i]:
+                    if distance[neibourgh] == -1:
+                        nextLayer.append(neibourgh)
+                        previous[neibourgh].append(i)
+            depth += 1
+            currentLayer = nextLayer
+
+        return distance, previous            
+
+
     def Diameter(self):
         """ Calculate diameter using BFS search. O(n^2) """
         N = len(self.nodes)
@@ -339,7 +365,7 @@ class Network:
         self.nodes = defaultdict(set)
         
         for i in range(n):
-            for j in range(1, k):
+            for j in range(1, k+1):
                 if i+j > n-1:
                     self.nodes[i].add(i+j-n)
                     self.nodes[i+j-n].add(i)
@@ -351,22 +377,28 @@ class Network:
         """ Calculate the closeness centrality for a given node.
             calculates using the path from node to target
         """
-        print("begin")
-        ans = 0
-        for i in self.nodes:
-            if i == node:
-                continue
-            path = self.ShortestPath(node, i)
-            if path == None:
-                print(node, i)
+        distance, _ = self.ShortestPaths(node)
+
+        total = 0
+        for other in distance:
+            if distance[other] == -1:
                 return 0
-            ans += len(path)
-        
-        print(ans)
+            else:
+                total += distance[other]
 
-        return 1/ans
+        return (len(self.nodes) - 1) / total
 
+    def HarmonicCentrality(self, node):
+        """ Calculate the harmonics centrality for a given node. """
+        distance, _ = self.ShortestPaths(node)
 
+        total = 0
+        for other in distance:
+            if distance[other] == -1 or other == node:
+                continue
+            else: 
+                total += 1/distance[other]
+        return total / (len(self.nodes) - 1)
 
     #""" DRAWING STUFF """
     def DrawNetwork(self):
@@ -387,6 +419,7 @@ class Network:
         l = mlines.Line2D([p1[0], p1[1]], [p2[0], p2[1]])
         ax.add_line(l)
         return l
+
 
 
 
