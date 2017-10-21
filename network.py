@@ -150,7 +150,7 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("In-Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
@@ -172,7 +172,7 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("Out-Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
@@ -196,7 +196,7 @@ class Network:
             distribution[d] = distribution[d] / normalization
 
         plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
+        plt.xlabel("Total Degree")
         plt.ylabel("Fraction of Nodes")
         plt.show()
 
