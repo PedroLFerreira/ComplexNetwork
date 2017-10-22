@@ -96,20 +96,42 @@ class Network:
     def WS_Random(self, N, K, beta):
         """ Generates a WS random network with N, K, beta parameters. """
         self.isDirected = False
+        t = time.clock()
+        print("Creating a WS random network with N={} nodes, K={} initial neighbors and relink probability beta={}.".format(N, K, beta))
         self.CircularGraph(N, K)
-
-        iterated = [None]*N
+        #print(self.nodes)
 
         for n in self.nodes:
-            for v in self.nodes:
-                pass
-            iterated[n] = self.nodes[n]
+            buffer = self.nodes[n].copy()
+            #print("n={}".format(n))
+            for v in buffer:
+                #print("   v={}".format(v))
+                if random.uniform(0,1) < beta:
+                    r = random.choice(list(self.nodes.keys()-buffer-{v,n}))
+                    #print("      r={}".format(r))
+                    #print("        Before:")
+                    #print("          node n:"+str(self.nodes[n]))
+                    #print("          node v:"+str(self.nodes[v]))
+                    #print("          node r:"+str(self.nodes[r]))
+                    #print()
+                    self.nodes[n].remove(v)
+                    self.nodes[v].remove(n)
+                    self.nodes[n].add(r)
+                    self.nodes[r].add(n)
+                    #print("        After:")
+                    #print("          node n:"+str(self.nodes[n]))
+                    #print("          node v:"+str(self.nodes[v]))
+                    #print("          node r:"+str(self.nodes[r]))
+        #print(self.nodes)
+        t = time.clock() - t
+        print("WS-Random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+
+            
 
 
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. """
         self.nodes[fromNode].add(toNode)
-
 
     def ShowNodes(self):
         """ Prints adjacency list to the console """
@@ -117,7 +139,6 @@ class Network:
         for node in self.nodes:
             print(str(node) + ":" + str(self.nodes[node]))
         print("===================\n")
-
 
     def Degree(self, node):
         """ Computes the degree of the node. """
