@@ -505,33 +505,39 @@ class Network:
                     self.nodes[i].add(i+j)
                     self.nodes[i+j].add(i)
 
-    def ClosenessCentrality(self, node):
+    def ClosenessCentrality(self, node=None):
         """ Calculate the closeness centrality for a given node.
             calculates using the path from node to target
         """
-        distance, _, _, _ = self.ShortestPaths(node)
+        if node != None:
+            distance, _, _, _ = self.ShortestPaths(node)
 
-        total = 0
-        for other in distance:
-            if distance[other] == -1:
-                return 0
-            else:
-                total += distance[other]
+            total = 0
+            for other in distance:
+                if distance[other] == -1:
+                    return 0
+                else:
+                    total += distance[other]
 
-        return (len(self.nodes) - 1) / total
+            return (len(self.nodes) - 1) / total
+        else:
+            return dict([(i, self.ClosenessCentrality(i)) for i in self.nodes])
     
-    def HarmonicCentrality(self, node):
+    def HarmonicCentrality(self, node=None):
         """ Calculate the harmonic centrality for a given node. """
-        distance, _, _, _ = self.ShortestPaths(node)
+        if node != None:
+            distance, _, _, _ = self.ShortestPaths(node)
 
-        total = 0
-        for other in distance:
-            if distance[other] == -1 or other == node:
-                continue
-            else: 
-                total += 1/distance[other]
-        return total / (len(self.nodes) - 1)
-    
+            total = 0
+            for other in distance:
+                if distance[other] == -1 or other == node:
+                    continue
+                else: 
+                    total += 1/distance[other]
+            return total / (len(self.nodes) - 1)
+        else:
+            return dict([(i, self.HarmonicCentrality(i)) for i in self.nodes])
+
     def BetweennessCentrality(self):
         """ Calculate the betweenness centrality for all nodes. """
         # i think this is an aproximation. Maybe calculate the proper value?
@@ -583,8 +589,9 @@ class Network:
 
         return CB
     
-    def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
-        """ Calculate the Eigenvector centrality for all nodes. """
+    def GetAdjMatrix(self):
+        """ return the adjacy matrix """
+
         M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
         
         traslationIn = {}
@@ -595,6 +602,13 @@ class Network:
         for i in self.nodes:
             for j in self.nodes[i]:
                 M[traslationIn[i], traslationIn[j]] = 1
+        
+        return M
+
+
+    def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
+        """ Calculate the Eigenvector centrality for all nodes. """
+        M = self.GetAdjMatrix()
 
         x = np.ones(shape=len(self.nodes))
 
@@ -614,16 +628,7 @@ class Network:
 
     def KatzCentrality(self, alpha=.9, epsilon=1e-6, max_iter=100):
         """ Calculate the Katz centrality for all nodes """
-        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
-        
-        traslationIn = {}
-
-        for i,n in enumerate(self.nodes):
-            traslationIn[n] = i
-
-        for i in self.nodes:
-            for j in self.nodes[i]:
-                M[traslationIn[i], traslationIn[j]] = 1
+        M = self.GetAdjMatrix()
 
         x = np.ones(shape=len(self.nodes))
 
@@ -643,16 +648,7 @@ class Network:
 
     def PageRank(self, alpha=.9, epsilon=1e-6, max_iter=100):
         """ Calculate PageRank centrality for all nodes """
-        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
-        
-        traslationIn = {}
-
-        for i,n in enumerate(self.nodes):
-            traslationIn[n] = i
-
-        for i in self.nodes:
-            for j in self.nodes[i]:
-                M[traslationIn[i], traslationIn[j]] = 1
+        M = self.GetAdjMatrix()
 
         kout = np.array([max(self.OutDegree(i), 1) for i in self.nodes])
 
@@ -671,6 +667,7 @@ class Network:
             print('did not converge')
 
         return dict(zip(self.nodes.keys(),x))
+    
 
     #""" DRAWING STUFF """
     def DrawNetwork(self, useForce = False, forceIterations = 50, drawNodeNames = False, colormap = 'summer', colorFilter = None, sizeFilter = None):        
