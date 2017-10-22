@@ -477,15 +477,21 @@ class Network:
             positions[node] = [x,y]
 
         attractionMultiplier = 2
-        restLength = .5
+        globalAttractionMultiplier = 0.1
+        restLength = 1
+        globalRestLength = 2
         repulsionMultiplier = .5
-        forceMultiplier = .05
+        forceMultiplier = 1
 
         ax = plt.gca()        
 
         ax.set_facecolor((0.1, 0.1, 0.1))
 
+        print("Starting force-based layout algorithm...")
+        t = time.clock()
         for i in range(100):
+            
+            print(str(i)+"%\r")
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
@@ -496,32 +502,42 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    repulsion = min(repulsionMultiplier/d**2, 5)
+                    repulsion = min(repulsionMultiplier/d**3, 5)
 
                     xForce = -repulsion
 
                     if n in self.Neighborhood(node):
                         attraction = max(attractionMultiplier*math.log(d/restLength),0)
                         xForce = attraction-repulsion
+                    else:
+                        globalAttraction = max(globalAttractionMultiplier*math.log(d/globalRestLength),0)
+                        xForce = globalAttraction-repulsion
 
-                    angle = math.atan2(v-y,u-x)
-                    x = x + forceMultiplier*xForce*math.cos(angle)
-                    y = y + forceMultiplier*xForce*math.sin(angle)
+                    angle = math.atan2(v-y, u-x)
+                    x = x + forceMultiplier*xForce*math.cos(angle)/(i+1)
+                    y = y + forceMultiplier*xForce*math.sin(angle)/(i+1)
                         
                 positions[node] = [x,y]
-
+        print("Force-based layout algorithm finished in "+str(time.clock() - t)+" seconds.")
+        
+        print("Drawing links...")
+        t = time.clock()
         for n in self.nodes:
             for v in self.nodes[n]:
-                print("{}  {}".format(positions[n],positions[v]))
-                self._DrawLink(positions[n],positions[v], ax)
+                #self._DrawLink(positions[n],positions[v], ax)
                 self._DrawArrow(positions[n], positions[v], ax)
-        #self._DrawArrow([2,0],[2.2,0.2],ax)
+        print("Links drawn in "+str(time.clock() - t)+" seconds.")
+
         maxFltr = 0
         cmap = plt.get_cmap('summer')
+        print("Drawing nodes...")
+        t = time.clock()
         for node in self.nodes:
             fltr = self.InDegree(node)
             maxFltr = max(maxFltr, fltr, 1e-6)
             ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = cmap(fltr/maxFltr)))
+        print("Nodes drawn in "+str(time.clock() - t)+" seconds.")
+
         #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         
         plt.axis('scaled')
@@ -540,7 +556,7 @@ class Network:
         return l
 
     def _DrawArrow(self, p1, p2, ax):
-        ax.arrow(p1[0], p1[1], p2[0]-p1[0], p2[1]-p1[1], head_width = 0.1, head_length = 0.15, color = (1,1,1), alpha = 0.1, length_includes_head = True, zorder = 0)
+        ax.arrow(p1[0], p1[1], p2[0]-p1[0], p2[1]-p1[1], head_width = 0.05, head_length = 0.1, color = (1,1,1), alpha = 0.1, length_includes_head = True, zorder = 0)
 
 
     
