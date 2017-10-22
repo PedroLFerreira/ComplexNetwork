@@ -97,13 +97,34 @@ class Network:
         """ Generates a WS random network with N, K, beta parameters. """
         self.isDirected = False
         self.CircularGraph(N, K)
+        #print(self.nodes)
 
-        iterated = [None]*N
+
 
         for n in self.nodes:
-            for v in self.nodes:
-                pass
-            iterated[n] = self.nodes[n]
+            buffer = self.nodes[n].copy()
+            #print("n={}".format(n))
+            for v in buffer:
+                #print("   v={}".format(v))
+                if random.uniform(0,1) < beta:
+                    r = random.choice(list(self.nodes.keys()-buffer-{v,n}))
+                    #print("      r={}".format(r))
+                    #print("        Before:")
+                    #print("          node n:"+str(self.nodes[n]))
+                    #print("          node v:"+str(self.nodes[v]))
+                    #print("          node r:"+str(self.nodes[r]))
+                    #print()
+                    self.nodes[n].remove(v)
+                    self.nodes[v].remove(n)
+                    self.nodes[n].add(r)
+                    self.nodes[r].add(n)
+                    #print("        After:")
+                    #print("          node n:"+str(self.nodes[n]))
+                    #print("          node v:"+str(self.nodes[v]))
+                    #print("          node r:"+str(self.nodes[r]))
+        #print(self.nodes)
+
+            
 
 
     def AddEdge(self, fromNode, toNode):
