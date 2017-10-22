@@ -96,10 +96,10 @@ class Network:
     def WS_Random(self, N, K, beta):
         """ Generates a WS random network with N, K, beta parameters. """
         self.isDirected = False
+        t = time.clock()
+        print("Creating a WS random network with N={} nodes, K={} initial neighbors and relink probability beta={}.".format(N, K, beta))
         self.CircularGraph(N, K)
         #print(self.nodes)
-
-
 
         for n in self.nodes:
             buffer = self.nodes[n].copy()
@@ -123,6 +123,8 @@ class Network:
                     #print("          node v:"+str(self.nodes[v]))
                     #print("          node r:"+str(self.nodes[r]))
         #print(self.nodes)
+        t = time.clock() - t
+        print("WS-Random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
             
 
@@ -131,14 +133,12 @@ class Network:
         """ Adds an edge between fromNode to toNode. """
         self.nodes[fromNode].add(toNode)
 
-
     def ShowNodes(self):
         """ Prints adjacency list to the console """
         print("\n=======NODES=======")
         for node in self.nodes:
             print(str(node) + ":" + str(self.nodes[node]))
         print("===================\n")
-
 
     def Degree(self, node):
         """ Computes the degree of the node. """
