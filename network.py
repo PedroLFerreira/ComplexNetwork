@@ -31,7 +31,7 @@ class Network:
         else:
             for line in file:
                 line = line.split()
-                line = [int(x) for x in line]
+                #line = [int(x) for x in line]
                 listOfEdges.append(line)
         self.Init(listOfEdges, isDirected)
 
@@ -92,6 +92,18 @@ class Network:
                     print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
         t = time.clock() - t
         print("ER-Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
+
+    def WS_Random(self, N, K, beta):
+        """ Generates a WS random network with N, K, beta parameters. """
+        self.isDirected = False
+        self.CircularGraph(N, K)
+
+        iterated = [None]*N
+
+        for n in self.nodes:
+            for v in self.nodes:
+                pass
+            iterated[n] = self.nodes[n]
 
 
     def AddEdge(self, fromNode, toNode):
@@ -519,14 +531,14 @@ class Network:
         i = 0
         for node in self.nodes:
             i+=1
-            x,y = i, random.uniform(0,1)
+            x,y = random.uniform(0,10), random.uniform(0,10)
             positions[node] = [x,y]
 
-        attractionMultiplier = 2
-        globalAttractionMultiplier = 0.1
-        restLength = 1
-        globalRestLength = 2
-        repulsionMultiplier = .5
+        attractionMultiplier = 5
+        globalAttractionMultiplier = 0.01
+        restLength = 0.5
+        globalRestLength = 3
+        repulsionMultiplier = .1
         forceMultiplier = 1
 
         ax = plt.gca()        
@@ -535,9 +547,10 @@ class Network:
 
         print("Starting force-based layout algorithm...")
         t = time.clock()
-        for i in range(100):
+        iterations = 50
+        for i in range(iterations):
             
-            print(str(i)+"%\r")
+            print(str(i/iterations*100)+"%\r")
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
@@ -548,7 +561,7 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    repulsion = min(repulsionMultiplier/d**3, 5)
+                    repulsion = min(repulsionMultiplier/d**3, 2)
 
                     xForce = -repulsion
 
@@ -580,14 +593,19 @@ class Network:
                     #self._DrawArrow(positions[n], positions[v], ax)
         print("Links drawn in "+str(time.clock() - t)+" seconds.")
 
-        maxFltr = 0
+        maxFltr = 1e-6
+        fltr = {}
         cmap = plt.get_cmap('summer')
-        print("Drawing nodes...")
-        t = time.clock()
         for node in self.nodes:
-            fltr = self.InDegree(node)
-            maxFltr = max(maxFltr, fltr, 1e-6)
-            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = cmap(fltr/maxFltr)))
+            fltr[node] = self.Degree(node)
+            #print(fltr[node])
+            maxFltr = max(maxFltr, fltr[node])
+
+        t = time.clock()
+        print("Drawing nodes...")
+        for node in self.nodes:
+            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = cmap(fltr[node]/maxFltr)))
+            ax.text(positions[node][0], positions[node][1]+0.1, s=str(node), color='gray')
         print("Nodes drawn in "+str(time.clock() - t)+" seconds.")
 
         #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
