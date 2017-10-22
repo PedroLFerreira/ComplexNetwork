@@ -79,7 +79,7 @@ class Network:
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
-        if self.isDirected:
+        if not self.isDirected:
             for n in range(V):
                 for v in range(n,V):
                     if(v != n and random.uniform(0,1) < p):
