@@ -2,8 +2,8 @@ from network import Network
 import network as nt
 
 
-nt.np.random.seed(47)
-nt.random.seed(47)
+#nt.np.random.seed(47)
+#nt.random.seed(47)
 
 net = Network()
 
@@ -26,3 +26,11 @@ for key in net.nodes:
     print(key, "{:8f}   {:8f}   {:8f}".format(bd1[key], bd2[key], EC[key]), sep='\t')
 
 #print(net.EigenvectorCentrality())
+
+path = net.ShortestPath(0, 5)
+distance, _, _, _ = net.ShortestPaths(0)
+
+if path == None:
+    print(distance[5])
+else:
+    print(len(path) - 1, distance[5])

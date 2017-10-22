@@ -321,6 +321,42 @@ class Network:
     
     def ShortestPath(self, start, goal):
         """ Returns shortest path from start to goal. """
+
+        distance = {}
+        for i in self.nodes:
+            distance[i] = -1
+
+        previous = {}
+        for i in self.nodes:
+            previous[i] = None
+
+        Q = deque([start])
+        distance[start] = 0
+
+        leave = False
+
+        while len(Q) != 0 and not leave:
+            v = Q.popleft()
+
+            for neighbor in self.nodes[v]:
+                if distance[neighbor] == -1:
+                    Q.append(neighbor)
+                    distance[neighbor] = distance[v] + 1
+                    previous[neighbor] = v
+                    if neighbor == goal:
+                        leave = True
+                        break
+
+        if previous[goal] == None:
+            return None
+        
+        path = [goal]
+
+        while previous[path[-1]] != None:
+            path.append(previous[path[-1]])
+
+        return path[::-1]
+
         queue = [(start, [start])]
         while queue:
             (node, path) = queue.pop(0)
