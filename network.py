@@ -485,6 +485,38 @@ class Network:
             CB[key] *= 1 / ((n - 1) * (n - 2))
 
         return CB
+
+    def BetweennessCentrality2(self):
+        """ Calculate the betweenness centrality for all nodes. """
+        # i think this is an aproximation. Maybe calculate the proper value?
+        CB = defaultdict(int)
+
+        dDistance, dPrevious, dPaths, dS = {},{},{},{}
+
+        for i in self.nodes:
+            distance, previous, paths, S = self.ShortestPaths(i)
+
+            dDistance[i] = distance
+            dPrevious[i] = previous
+            dPaths[i] = paths
+            dS[i] = S
+
+        for s in self.nodes:
+            for v in self.nodes:
+                for t in self.nodes:
+                    if not (s != v != t):
+                        continue
+                    if dDistance[s][t] == dDistance[s][v] + dDistance[v][t]:
+                        if (dPaths[s][v] * dPaths[v][t]) > dPaths[s][t]:
+                            print("fuck fuck fuck fuck")
+                            print(s, v, t)
+                        CB[v] += dPaths[s][v]*dPaths[v][t]/dPaths[s][t]
+        
+        n = len(self.nodes)
+        for key in CB:
+            CB[key] *= 1 / ((n - 1) * (n - 2))
+
+        return CB
     
     def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
         """ Calculate the Eigenvector centrality for all nodes. """
@@ -509,7 +541,7 @@ class Network:
             if (np.sum(abs(x_i-x)) < epsilon):
                 print('converged')
                 break
-            #compare x and x_i
+
             x = x_i
 
         return dict(zip(self.nodes.keys(),x))
