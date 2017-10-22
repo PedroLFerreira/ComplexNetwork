@@ -13,7 +13,12 @@ class Network:
     def __init__(self):
         self.nodes = defaultdict(set)
         self.isDirected = False
+        self.setSeed()
 
+    def setSeed(self, s = 42):
+        np.random.seed(s)
+        random.seed(s)
+        
     def Load(self, filename, length = None, isDirected = False):
         """ Imports a list of edges to construct network. """
         self.isDirected = isDirected
@@ -206,7 +211,7 @@ class Network:
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
-    def DegreeDistribution(self):
+    def DegreeDistribution(self, showPlot = True, loglogscale = False):
         """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
@@ -220,11 +225,14 @@ class Network:
         normalization = sum(distribution)
         for d in range(0, len(distribution)):
             distribution[d] = distribution[d] / normalization
-        
-        plt.plot(range(0,len(distribution)), distribution)
-        plt.xlabel("Degree")
-        plt.ylabel("Fraction of Nodes")
-        plt.show()
+        if showPlot:
+            ax = plt.plot(range(0,len(distribution)), distribution)
+            if loglogscale:
+                plt.xscale('log')
+                plt.yscale('log')
+            plt.xlabel("Degree")
+            plt.ylabel("Fraction of Nodes")
+            plt.show()
 
         return distribution
     
