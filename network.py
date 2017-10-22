@@ -12,9 +12,11 @@ class Network:
     
     def __init__(self):
         self.nodes = defaultdict(set)
+        self.isDirected = False
 
-    def Load(self, filename, length = None):
+    def Load(self, filename, length = None, isDirected = False):
         """ Imports a list of edges to construct network. """
+        self.isDirected = isDirected
         file = open(filename, 'r')
         self.nodes = defaultdict(set)
         listOfEdges = []
@@ -31,7 +33,7 @@ class Network:
                 line = line.split()
                 line = [int(x) for x in line]
                 listOfEdges.append(line)
-        self.Init(listOfEdges)
+        self.Init(listOfEdges, isDirected)
 
     def Save(self, filename):
         """ Saves network in edge list format. """
@@ -44,16 +46,28 @@ class Network:
                 file.write(str(n)+" "+str(v)+"\n")
                 
 
-    def Init(self, listOfEdges ):
+    def Init(self, listOfEdges, isDirected = False):
         """ Initializes graph from edge list. """
-        for edge in listOfEdges:
-            self.nodes[edge[0]].add(edge[1])
-            if edge[1] not in self.nodes:
-                self.nodes[edge[1]] = set()
+        self.isDirected = isDirected
+        if isDirected:
+            for edge in listOfEdges:
+                self.nodes[edge[0]].add(edge[1])
+                if edge[1] not in self.nodes:
+                    self.nodes[edge[1]] = set()
+        else:
+            print("is undirected ")
+            for edge in listOfEdges:
+                self.nodes[edge[0]].add(edge[1])
+                self.nodes[edge[1]].add(edge[0])
+                if edge[1] not in self.nodes:
+                    self.nodes[edge[1]] = set()
+                if edge[0] not in self.nodes:
+                    self.nodes[edge[0]] = set()
 
 
-    def ER_Random(self, V, p, undirected=False):
+    def ER_Random(self, V, p, isDirected=False):
         """ Generates a ER random network with V vertices and probability p of edge occurrence. """
+        self.isDirected = isDirected
         t = time.clock()
         print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
         for n in range(V):
@@ -61,7 +75,7 @@ class Network:
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
-        if undirected:
+        if not self.isDirected:
             for n in range(V):
                 for v in range(n,V):
                     if(v != n and random.uniform(0,1) < p):
@@ -522,10 +536,16 @@ class Network:
         
         print("Drawing links...")
         t = time.clock()
-        for n in self.nodes:
-            for v in self.nodes[n]:
-                #self._DrawLink(positions[n],positions[v], ax)
-                self._DrawArrow(positions[n], positions[v], ax)
+        if self.isDirected:
+            for n in self.nodes:
+                for v in self.nodes[n]:
+                    #self._DrawLink(positions[n],positions[v], ax)
+                    self._DrawArrow(positions[n], positions[v], ax)
+        else:
+            for n in self.nodes:
+                for v in self.nodes[n]:
+                    self._DrawLink(positions[n],positions[v], ax)
+                    #self._DrawArrow(positions[n], positions[v], ax)
         print("Links drawn in "+str(time.clock() - t)+" seconds.")
 
         maxFltr = 0
