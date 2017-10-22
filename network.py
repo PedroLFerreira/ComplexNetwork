@@ -55,7 +55,6 @@ class Network:
                 if edge[1] not in self.nodes:
                     self.nodes[edge[1]] = set()
         else:
-            print("is undirected ")
             for edge in listOfEdges:
                 self.nodes[edge[0]].add(edge[1])
                 self.nodes[edge[1]].add(edge[0])
@@ -91,7 +90,7 @@ class Network:
                 if((n+1)%(V/100)==0):
                     print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
         t = time.clock() - t
-        print("ER-Random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
+        print("ER random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
 
     def WS_Random(self, N, K, beta):
         """ Generates a WS random network with N, K, beta parameters. """
@@ -124,14 +123,49 @@ class Network:
                     #print("          node r:"+str(self.nodes[r]))
         #print(self.nodes)
         t = time.clock() - t
-        print("WS-Random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+        print("WS random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
-            
+    def BA_Random(self, N, initialNetwork = None):
+        """ Generates a BA random network (scale-free) with N nodes, starting with initialNetwork.
+        If initialNetwork is not provided, start with [[0,1],[1,2]]. """
+        self.isDirected = False
+        t = time.clock()
+        print("Creating a BS random network with N={} nodes.".format(N))
+
+        if initialNetwork==None:
+            self.Init([[0,1],[1,2]])
+        else:
+            self.Init(initialNetwork)
+
+        N0 = self.NodeCount()
+
+        for n in range(N-N0):
+            normalization = sum([self.Degree(node) for node in self.nodes])
+            #print("normalization="+str(normalization))
+
+            degrees = [ self.Degree(v)/normalization for v in self.nodes ]
+            choices = list(random.choices(list(self.nodes.keys()), weights=degrees))
+            #print("degrees="+str(degrees))
+            #print("choices="+str(choices))
+            #print()
+
+            self.nodes[n + N0]=set()
+            for c in choices:
+                self.nodes[n].add(c)
+                self.nodes[c].add(n)
+
+
+
+        t = time.clock() - t
+        print("BS random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+
 
 
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. """
         self.nodes[fromNode].add(toNode)
+        if not self.isDirected:
+            self.nodes[toNode].add(fromNode)
 
     def ShowNodes(self):
         """ Prints adjacency list to the console """
@@ -637,7 +671,7 @@ class Network:
         return dict(zip(self.nodes.keys(),x))
 
     #""" DRAWING STUFF """
-    def DrawNetwork(self):
+    def DrawNetwork(self, useForce = False, forceIterations = 50, drawNodeNames = False, colormap = 'summer', colorFilter = None, sizeFilter = None):        
         positions = defaultdict(set)
         i = 0
         for node in self.nodes:
@@ -655,41 +689,40 @@ class Network:
         ax = plt.gca()        
 
         ax.set_facecolor((0.1, 0.1, 0.1))
-
-        print("Starting force-based layout algorithm...")
-        t = time.clock()
-        iterations = 50
-        for i in range(iterations):
-            
-            print(str(i/iterations*100)+"%", end='\r')
-            for node in self.nodes:
-                x = positions[node][0]
-                y = positions[node][1]
-                for n in self.nodes:
-                    if n==node:
-                        continue
-                    u = positions[n][0]
-                    v = positions[n][1]
-                    d = math.sqrt((x-u)**2+(y-v)**2)
-                    
-                    repulsion = min(repulsionMultiplier/d**3, 2)
-
-                    xForce = -repulsion
-
-                    if n in self.Neighborhood(node):
-                        attraction = max(attractionMultiplier*math.log(d/restLength),0)
-                        xForce = attraction-repulsion
-                    else:
-                        globalAttraction = max(globalAttractionMultiplier*math.log(d/globalRestLength),0)
-                        xForce = globalAttraction-repulsion
-
-                    angle = math.atan2(v-y, u-x)
-                    x = x + forceMultiplier*xForce*math.cos(angle)/(i+1)
-                    y = y + forceMultiplier*xForce*math.sin(angle)/(i+1)
+        if useForce:
+            print("Starting force-based layout algorithm...")
+            t = time.clock()
+            for i in range(forceIterations):
+                
+                print("   "+str(i/forceIterations*100)+"%", end='\r')
+                for node in self.nodes:
+                    x = positions[node][0]
+                    y = positions[node][1]
+                    for n in self.nodes:
+                        if n==node:
+                            continue
+                        u = positions[n][0]
+                        v = positions[n][1]
+                        d = math.sqrt((x-u)**2+(y-v)**2)
                         
-                positions[node] = [x,y]
-        print("Force-based layout algorithm finished in "+str(time.clock() - t)+" seconds.")
-        
+                        repulsion = min(repulsionMultiplier/d**2, 2)
+
+                        xForce = -repulsion
+
+                        if n in self.Neighborhood(node):
+                            attraction = max(attractionMultiplier*math.log(d/restLength),0)
+                            xForce = attraction-repulsion
+                        else:
+                            globalAttraction = max(globalAttractionMultiplier*math.log(d/globalRestLength),0)
+                            xForce = globalAttraction-repulsion
+
+                        angle = math.atan2(v-y, u-x)
+                        x = x + forceMultiplier*xForce*math.cos(angle)/(i+5)
+                        y = y + forceMultiplier*xForce*math.sin(angle)/(i+5)
+                            
+                    positions[node] = [x,y]
+            print("Force-based layout algorithm finished in "+str(time.clock() - t)+" seconds.")
+            
         print("Drawing links...")
         t = time.clock()
         if self.isDirected:
@@ -706,21 +739,28 @@ class Network:
 
         maxFltr = 1e-6
         fltr = {}
-        cmap = plt.get_cmap('summer')
         for node in self.nodes:
             fltr[node] = self.Degree(node)
             #print(fltr[node])
             maxFltr = max(maxFltr, fltr[node])
 
+
+
         t = time.clock()
         print("Drawing nodes...")
+        cmap = plt.get_cmap(colormap)
+        if colorFilter == None:
+            colorFilter = np.zeros(len(self.nodes))
+        if sizeFilter == None:
+            sizeFilter = [0.05]*len(self.nodes)
+
         for node in self.nodes:
-            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = cmap(fltr[node]/maxFltr)))
-            ax.text(positions[node][0], positions[node][1]+0.1, s=str(node), color='gray')
+            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = sizeFilter[node], color = cmap(colorFilter[node])))
+            if drawNodeNames:
+                ax.text(positions[node][0], positions[node][1]+0.1, s=str(node), color='gray')
         print("Nodes drawn in "+str(time.clock() - t)+" seconds.")
 
-        #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
-        
+        ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
         plt.show()
 
