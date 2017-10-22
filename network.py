@@ -581,8 +581,9 @@ class Network:
 
         return CB
     
-    def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
-        """ Calculate the Eigenvector centrality for all nodes. """
+    def GetAdjMatrix(self):
+        """ return the adjacy matrix """
+
         M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
         
         traslationIn = {}
@@ -593,6 +594,13 @@ class Network:
         for i in self.nodes:
             for j in self.nodes[i]:
                 M[traslationIn[i], traslationIn[j]] = 1
+        
+        return M
+
+
+    def EigenvectorCentrality(self, epsilon=1e-6, max_iter=100):
+        """ Calculate the Eigenvector centrality for all nodes. """
+        M = self.GetAdjMatrix()
 
         x = np.ones(shape=len(self.nodes))
 
@@ -612,16 +620,7 @@ class Network:
 
     def KatzCentrality(self, alpha=.9, epsilon=1e-6, max_iter=100):
         """ Calculate the Katz centrality for all nodes """
-        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
-        
-        traslationIn = {}
-
-        for i,n in enumerate(self.nodes):
-            traslationIn[n] = i
-
-        for i in self.nodes:
-            for j in self.nodes[i]:
-                M[traslationIn[i], traslationIn[j]] = 1
+        M = self.GetAdjMatrix()
 
         x = np.ones(shape=len(self.nodes))
 
@@ -641,16 +640,7 @@ class Network:
 
     def PageRank(self, alpha=.9, epsilon=1e-6, max_iter=100):
         """ Calculate PageRank centrality for all nodes """
-        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
-        
-        traslationIn = {}
-
-        for i,n in enumerate(self.nodes):
-            traslationIn[n] = i
-
-        for i in self.nodes:
-            for j in self.nodes[i]:
-                M[traslationIn[i], traslationIn[j]] = 1
+        M = self.GetAdjMatrix()
 
         kout = np.array([max(self.OutDegree(i), 1) for i in self.nodes])
 
@@ -669,6 +659,7 @@ class Network:
             print('did not converge')
 
         return dict(zip(self.nodes.keys(),x))
+    
 
     #""" DRAWING STUFF """
     def DrawNetwork(self, useForce = False, forceIterations = 50, drawNodeNames = False, colormap = 'summer', colorFilter = None, sizeFilter = None):        
