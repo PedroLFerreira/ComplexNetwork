@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as clrs
 from collections import defaultdict
 import random
 import time
@@ -469,16 +470,19 @@ class Network:
     #""" DRAWING STUFF """
     def DrawNetwork(self):
         positions = defaultdict(set)
+        i = 0
         for node in self.nodes:
-            x,y = random.uniform(0, 10), random.uniform(0,10)
+            i+=1
+            x,y = i, random.uniform(0,1)
             positions[node] = [x,y]
 
         attractionMultiplier = 2
-        restLength = .1
-        repulsionMultiplier = 1
-        forceMultiplier = .1
+        restLength = .5
+        repulsionMultiplier = .5
+        forceMultiplier = .05
 
-        ax = plt.gca()
+        ax = plt.gca()        
+
         ax.set_facecolor((0.1, 0.1, 0.1))
 
         for i in range(100):
@@ -492,7 +496,7 @@ class Network:
                     v = positions[n][1]
                     d = math.sqrt((x-u)**2+(y-v)**2)
                     
-                    repulsion = min(repulsionMultiplier/d**2, 10)
+                    repulsion = min(repulsionMultiplier/d**2, 5)
 
                     xForce = -repulsion
 
@@ -508,13 +512,18 @@ class Network:
 
         for n in self.nodes:
             for v in self.nodes[n]:
+                print("{}  {}".format(positions[n],positions[v]))
                 self._DrawLink(positions[n],positions[v], ax)
-
+                self._DrawArrow(positions[n], positions[v], ax)
+        #self._DrawArrow([2,0],[2.2,0.2],ax)
+        maxFltr = 0
+        cmap = plt.get_cmap('summer')
         for node in self.nodes:
-            fltr = self.HarmonicCentrality(node)
-            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = (0.2*fltr+0.8,0.2,0.9*fltr+0.1) ))
-        
+            fltr = self.InDegree(node)
+            maxFltr = max(maxFltr, fltr, 1e-6)
+            ax.add_patch(self._DrawNode(positions[node][0], positions[node][1], radius = .05, color = cmap(fltr/maxFltr)))
         #ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
+        
         plt.axis('scaled')
         plt.show()
 
@@ -525,13 +534,16 @@ class Network:
         node = plt.Circle((x, y), radius = radius, color = color)
         return node
         
-    def _DrawLink(self, p1, p2, plot):
-        
-        l = mlines.Line2D([p1[0], p2[0]], [p1[1], p2[1]], alpha=.1,zorder=0)
-        plot.add_line(l)
+    def _DrawLink(self, p1, p2, ax):
+        l = mlines.Line2D([p1[0], p2[0]], [p1[1], p2[1]], alpha = 0.2,zorder = 0)
+        ax.add_line(l)
         return l
 
+    def _DrawArrow(self, p1, p2, ax):
+        ax.arrow(p1[0], p1[1], p2[0]-p1[0], p2[1]-p1[1], head_width = 0.1, head_length = 0.15, color = (1,1,1), alpha = 0.1, length_includes_head = True, zorder = 0)
 
+
+    
 
 
 
