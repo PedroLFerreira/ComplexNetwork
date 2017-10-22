@@ -596,10 +596,11 @@ class Network:
             x_i /= np.linalg.norm(x_i)
 
             if (np.sum(abs(x_i-x)) < epsilon):
-                print('converged')
                 break
 
             x = x_i
+        else:
+            print('did not converge')
 
         return dict(zip(self.nodes.keys(),x))
 
