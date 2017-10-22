@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as clrs
-from collections import defaultdict
+from collections import defaultdict, deque
 import random
 import time
 import numpy as np
@@ -326,22 +326,20 @@ class Network:
         paths = defaultdict(int)
         paths[start] = 1
 
-        currentLayer = [start]
-        depth = 0
+        Q = deque([start])
+        distance[start] = 0
 
-        while len(currentLayer) != 0:
-            S += currentLayer
-            nextLayer = []
-            for i in currentLayer:
-                distance[i] = depth
-            for i in currentLayer:
-                for neiborgh in self.nodes[i]:
-                    if distance[neiborgh] == -1:
-                        paths[neiborgh] += paths[i]
-                        nextLayer.append(neiborgh)
-                        previous[neiborgh].append(i)
-            depth += 1
-            currentLayer = nextLayer
+        while len(Q) != 0:
+            v = Q.popleft()
+            S.append(v)
+
+            for neighbor in self.nodes[v]:
+                if distance[neighbor] == -1:
+                    Q.append(neighbor)
+                    distance[neighbor] = distance[v] + 1
+                if distance[neighbor] == distance[v] + 1:
+                    paths[neighbor] += paths[v]
+                    previous[neighbor].append(v)
 
         return distance, previous, paths, S
 
@@ -465,7 +463,7 @@ class Network:
 
         return CB
 
-    def BetweennessCentrality2(self):
+    def BetweennessCentralitySlow(self):
         """ Calculate the betweenness centrality for all nodes. """
         # i think this is an aproximation. Maybe calculate the proper value?
         CB = defaultdict(int)
@@ -486,9 +484,6 @@ class Network:
                     if not (s != v != t):
                         continue
                     if dDistance[s][t] == dDistance[s][v] + dDistance[v][t]:
-                        if (dPaths[s][v] * dPaths[v][t]) > dPaths[s][t]:
-                            print("fuck fuck fuck fuck")
-                            print(s, v, t)
                         CB[v] += dPaths[s][v]*dPaths[v][t]/dPaths[s][t]
         
         n = len(self.nodes)

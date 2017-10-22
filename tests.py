@@ -1,4 +1,9 @@
 from network import Network
+import network as nt
+
+
+nt.np.random.seed(47)
+nt.random.seed(47)
 
 net = Network()
 
@@ -12,7 +17,7 @@ print(net.AvClusteringCoefficient())
 print(net.ClosenessCentrality(0))
 print(net.HarmonicCentrality(0))
 bd1 = net.BetweennessCentrality()
-bd2 = net.BetweennessCentrality2()
+bd2 = net.BetweennessCentralitySlow()
 EC  = net.EigenvectorCentrality()
 
 print("compare algorthms:")
