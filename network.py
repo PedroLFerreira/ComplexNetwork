@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as clrs
-from collections import defaultdict
+from collections import defaultdict, deque
 import random
 import time
 import numpy as np
@@ -354,20 +354,39 @@ class Network:
         return visited
     
     def ShortestPath(self, start, goal):
-        """ Returns shortest path from start to goal. """
-        queue = [(start, [start])]
-        while queue:
-            (node, path) = queue.pop(0)
-            if self.nodes[node]-set(path) != set():
-                for next in self.nodes[node]-set(path):
-                    if next == set():
-                        continue
-                    if next == goal:
-                        return path + [next]
-                    else:
-                        queue.append((next, path + [next]))
-            else:
-                break
+        """ Returns shortest path from start to goal.
+            crashes if goal or path not in self.nodes
+        """
+
+        visited, previous = {}, {}
+        for i in self.nodes:
+            visited[i] = False
+            previous[i] = None
+
+        Q = deque([start])
+        visited[start] = True
+
+        leave = False
+        while len(Q) != 0 and not leave:
+            v = Q.popleft()
+
+            for neighbor in self.nodes[v]:
+                if visited[neighbor] == False:
+                    Q.append(neighbor)
+                    visited[neighbor] = True
+                    previous[neighbor] = v
+                    if neighbor == goal:
+                        leave = True
+                        break
+
+        if previous[goal] == None:
+            return None
+        
+        path = [goal]
+        while previous[path[-1]] != None:
+            path.append(previous[path[-1]])
+
+        return path[::-1]
     
     def ShortestPaths(self, start):
         """ Distances and shortest paths from start to the other nodes """
@@ -381,25 +400,32 @@ class Network:
         paths = defaultdict(int)
         paths[start] = 1
 
-        currentLayer = [start]
-        depth = 0
+        Q = deque([start])
+        distance[start] = 0
 
-        while len(currentLayer) != 0:
-            S += currentLayer
-            nextLayer = []
-            for i in currentLayer:
-                distance[i] = depth
-            for i in currentLayer:
-                for neiborgh in self.nodes[i]:
-                    if distance[neiborgh] == -1:
-                        paths[neiborgh] += paths[i]
-                        nextLayer.append(neiborgh)
-                        previous[neiborgh].append(i)
-            depth += 1
-            currentLayer = nextLayer
+        while len(Q) != 0:
+            v = Q.popleft()
+            S.append(v)
+
+            for neighbor in self.nodes[v]:
+                if distance[neighbor] == -1:
+                    Q.append(neighbor)
+                    distance[neighbor] = distance[v] + 1
+                if distance[neighbor] == distance[v] + 1:
+                    paths[neighbor] += paths[v]
+                    previous[neighbor].append(v)
 
         return distance, previous, paths, S
 
+    def AveragePathLenght(self):
+        totalDistance = 0
+        for i in self.nodes:
+            distance, _, _, _ = self.ShortestPaths(i)
+            if -1 in distance.values():
+                return float('inf')
+            totalDistance += sum(distance.values())
+
+        return totalDistance / (len(self.nodes) * (len(self.nodes) - 1))
 
     def Diameter(self):
         """ Calculate diameter using BFS search. O(n^2) """
@@ -520,7 +546,7 @@ class Network:
 
         return CB
 
-    def BetweennessCentrality2(self):
+    def BetweennessCentralitySlow(self):
         """ Calculate the betweenness centrality for all nodes. """
         # i think this is an aproximation. Maybe calculate the proper value?
         CB = defaultdict(int)
@@ -541,9 +567,6 @@ class Network:
                     if not (s != v != t):
                         continue
                     if dDistance[s][t] == dDistance[s][v] + dDistance[v][t]:
-                        if (dPaths[s][v] * dPaths[v][t]) > dPaths[s][t]:
-                            print("fuck fuck fuck fuck")
-                            print(s, v, t)
                         CB[v] += dPaths[s][v]*dPaths[v][t]/dPaths[s][t]
         
         n = len(self.nodes)
@@ -580,6 +603,66 @@ class Network:
 
         return dict(zip(self.nodes.keys(),x))
 
+    def KatzCentrality(self, alpha=.9, epsilon=1e-6, max_iter=100):
+        """ Calculate the Katz centrality for all nodes """
+        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
+        
+        traslationIn = {}
+
+        for i,n in enumerate(self.nodes):
+            traslationIn[n] = i
+
+        for i in self.nodes:
+            for j in self.nodes[i]:
+                M[traslationIn[i], traslationIn[j]] = 1
+
+        x = np.ones(shape=len(self.nodes))
+
+        for i in range(max_iter):
+            x_i = alpha * np.dot(M.T, x) + np.ones(len(x))
+
+            x_i /= np.linalg.norm(x_i)
+
+            if (np.sum(abs(x_i-x)) < epsilon):
+                break
+
+            x = x_i
+        else:
+            print('did not converge')
+
+        return dict(zip(self.nodes.keys(),x))
+
+    def PageRank(self, alpha=.9, epsilon=1e-6, max_iter=100):
+        """ Calculate PageRank centrality for all nodes """
+        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
+        
+        traslationIn = {}
+
+        for i,n in enumerate(self.nodes):
+            traslationIn[n] = i
+
+        for i in self.nodes:
+            for j in self.nodes[i]:
+                M[traslationIn[i], traslationIn[j]] = 1
+
+        kout = np.array([max(self.OutDegree(i), 1) for i in self.nodes])
+
+        x = np.ones(shape=len(self.nodes))
+
+        for i in range(max_iter):
+            x_i = alpha * np.dot(M.T, x/kout) + np.ones(len(x))
+
+            x_i /= np.linalg.norm(x_i)
+
+            if (np.sum(abs(x_i-x)) < epsilon):
+                break
+
+            x = x_i
+        else:
+            print('did not converge')
+
+        return dict(zip(self.nodes.keys(),x))
+
     #""" DRAWING STUFF """
     def DrawNetwork(self, useForce = False, forceIterations = 50, drawNodeNames = False, colormap = 'summer', colorFilter = None, sizeFilter = None):        
         positions = defaultdict(set)
@@ -604,7 +687,7 @@ class Network:
             t = time.clock()
             for i in range(forceIterations):
                 
-                print("   "+str(i/forceIterations*100)+"%",end='\r')
+                print("   "+str(i/forceIterations*100)+"%", end='\r')
                 for node in self.nodes:
                     x = positions[node][0]
                     y = positions[node][1]
