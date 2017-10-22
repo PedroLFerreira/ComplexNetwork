@@ -3,11 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as clrs
 import numpy as np
 from collections import defaultdict
-import operator
 
 
 net = Network()
-net.BA_Random(10)
+net.BA_Random(100)
 
 sfltr = [None]*net.NodeCount()
 for node in net.nodes:

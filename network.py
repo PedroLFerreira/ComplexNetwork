@@ -79,7 +79,7 @@ class Network:
             if((n+1)%(V/100)==0):
                 print("      Node Progress: {:.1f}%".format((n+1)/V*100))
         
-        if not self.isDirected:
+        if self.isDirected:
             for n in range(V):
                 for v in range(n,V):
                     if(v != n and random.uniform(0,1) < p):
@@ -591,9 +591,7 @@ class Network:
     
     def GetAdjMatrix(self):
         """ return the adjacy matrix """
-
         M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
-        
         traslationIn = {}
 
         for i,n in enumerate(self.nodes):
@@ -671,6 +669,7 @@ class Network:
 
     #""" DRAWING STUFF """
     def DrawNetwork(self, useForce = False, forceIterations = 50, drawNodeNames = False, colormap = 'summer', colorFilter = None, sizeFilter = None):        
+        """ Draws the network. useForce=True enables force-based layout."""
         positions = defaultdict(set)
         i = 0
         for node in self.nodes:
