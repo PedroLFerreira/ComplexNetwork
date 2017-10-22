@@ -320,7 +320,9 @@ class Network:
         return visited
     
     def ShortestPath(self, start, goal):
-        """ Returns shortest path from start to goal. """
+        """ Returns shortest path from start to goal.
+            crashes if goal or path not in self.nodes
+        """
 
         visited, previous = {}, {}
         for i in self.nodes:
@@ -381,6 +383,15 @@ class Network:
 
         return distance, previous, paths, S
 
+    def AveragePathLenght(self):
+        totalDistance = 0
+        for i in self.nodes:
+            distance, _, _, _ = self.ShortestPaths(i)
+            if -1 in distance.values():
+                return float('inf')
+            totalDistance += sum(distance.values())
+
+        return totalDistance / (len(self.nodes) * (len(self.nodes) - 1))
 
     def Diameter(self):
         """ Calculate diameter using BFS search. O(n^2) """
@@ -555,6 +566,66 @@ class Network:
                 break
 
             x = x_i
+
+        return dict(zip(self.nodes.keys(),x))
+
+    def KatzCentrality(self, alpha=.9, epsilon=1e-6, max_iter=100):
+        """ Calculate the Katz centrality for all nodes """
+        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
+        
+        traslationIn = {}
+
+        for i,n in enumerate(self.nodes):
+            traslationIn[n] = i
+
+        for i in self.nodes:
+            for j in self.nodes[i]:
+                M[traslationIn[i], traslationIn[j]] = 1
+
+        x = np.ones(shape=len(self.nodes))
+
+        for i in range(max_iter):
+            x_i = alpha * np.dot(M.T, x) + np.ones(len(x))
+
+            x_i /= np.linalg.norm(x_i)
+
+            if (np.sum(abs(x_i-x)) < epsilon):
+                break
+
+            x = x_i
+        else:
+            print('did not converge')
+
+        return dict(zip(self.nodes.keys(),x))
+
+    def PageRank(self, alpha=.9, epsilon=1e-6, max_iter=100):
+        """ Calculate PageRank centrality for all nodes """
+        M = np.zeros(shape = (len(self.nodes), len(self.nodes)))
+        
+        traslationIn = {}
+
+        for i,n in enumerate(self.nodes):
+            traslationIn[n] = i
+
+        for i in self.nodes:
+            for j in self.nodes[i]:
+                M[traslationIn[i], traslationIn[j]] = 1
+
+        kout = np.array([max(self.OutDegree(i), 1) for i in self.nodes])
+
+        x = np.ones(shape=len(self.nodes))
+
+        for i in range(max_iter):
+            x_i = alpha * np.dot(M.T, x/kout) + np.ones(len(x))
+
+            x_i /= np.linalg.norm(x_i)
+
+            if (np.sum(abs(x_i-x)) < epsilon):
+                break
+
+            x = x_i
+        else:
+            print('did not converge')
 
         return dict(zip(self.nodes.keys(),x))
 
