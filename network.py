@@ -463,33 +463,39 @@ class Network:
                     self.nodes[i].add(i+j)
                     self.nodes[i+j].add(i)
 
-    def ClosenessCentrality(self, node):
+    def ClosenessCentrality(self, node=None):
         """ Calculate the closeness centrality for a given node.
             calculates using the path from node to target
         """
-        distance, _, _, _ = self.ShortestPaths(node)
+        if node != None:
+            distance, _, _, _ = self.ShortestPaths(node)
 
-        total = 0
-        for other in distance:
-            if distance[other] == -1:
-                return 0
-            else:
-                total += distance[other]
+            total = 0
+            for other in distance:
+                if distance[other] == -1:
+                    return 0
+                else:
+                    total += distance[other]
 
-        return (len(self.nodes) - 1) / total
+            return (len(self.nodes) - 1) / total
+        else:
+            return dict([(i, self.ClosenessCentrality(i)) for i in self.nodes])
     
-    def HarmonicCentrality(self, node):
+    def HarmonicCentrality(self, node=None):
         """ Calculate the harmonic centrality for a given node. """
-        distance, _, _, _ = self.ShortestPaths(node)
+        if node != None:
+            distance, _, _, _ = self.ShortestPaths(node)
 
-        total = 0
-        for other in distance:
-            if distance[other] == -1 or other == node:
-                continue
-            else: 
-                total += 1/distance[other]
-        return total / (len(self.nodes) - 1)
-    
+            total = 0
+            for other in distance:
+                if distance[other] == -1 or other == node:
+                    continue
+                else: 
+                    total += 1/distance[other]
+            return total / (len(self.nodes) - 1)
+        else:
+            return dict([(i, self.HarmonicCentrality(i)) for i in self.nodes])
+
     def BetweennessCentrality(self):
         """ Calculate the betweenness centrality for all nodes. """
         # i think this is an aproximation. Maybe calculate the proper value?

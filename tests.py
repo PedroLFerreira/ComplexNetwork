@@ -1,13 +1,13 @@
 from network import Network
 import network as nt
 
-nt.np.random.seed(47)
-nt.random.seed(47)
+#nt.np.random.seed(47)
+#nt.random.seed(47)
 
 net = Network()
 
 #net.CircularGraph(19, 1)
-net.ER_Random(V=20, p=0.1, isDirected=True)
+net.ER_Random(V=20, p=0.2)
 #net.Init([[1,0], [2,0], [3,0], [4,0], [5,0], [0,1], [0,2], [0,3], [0,4], [0,5]])
 net.ShowNodes()
 
@@ -32,4 +32,6 @@ for key in net.nodes:
 # print(path)
 
 print('average lengh: ', net.AveragePathLenght())
+
+print(net.ClosenessCentrality())
 net.DrawNetwork()
