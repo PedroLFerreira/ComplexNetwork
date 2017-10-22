@@ -11,7 +11,7 @@ net = Network()
 net.ER_Random(V=20, p=0.1)
 #net.Init([[1,0], [2,0], [3,0], [4,0], [5,0], [0,1], [0,2], [0,3], [0,4], [0,5]])
 net.ShowNodes()
-net.DrawNetwork()
+
 print(net.AvClusteringCoefficient())
 
 print(net.ClosenessCentrality(0))
@@ -28,9 +28,5 @@ for key in net.nodes:
 #print(net.EigenvectorCentrality())
 
 path = net.ShortestPath(0, 5)
-distance, _, _, _ = net.ShortestPaths(0)
-
-if path == None:
-    print(distance[5])
-else:
-    print(len(path) - 1, distance[5])
+print(path)
+net.DrawNetwork()

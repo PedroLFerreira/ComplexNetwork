@@ -322,26 +322,22 @@ class Network:
     def ShortestPath(self, start, goal):
         """ Returns shortest path from start to goal. """
 
-        distance = {}
+        visited, previous = {}, {}
         for i in self.nodes:
-            distance[i] = -1
-
-        previous = {}
-        for i in self.nodes:
+            visited[i] = False
             previous[i] = None
 
         Q = deque([start])
-        distance[start] = 0
+        visited[start] = True
 
         leave = False
-
         while len(Q) != 0 and not leave:
             v = Q.popleft()
 
             for neighbor in self.nodes[v]:
-                if distance[neighbor] == -1:
+                if visited[neighbor] == False:
                     Q.append(neighbor)
-                    distance[neighbor] = distance[v] + 1
+                    visited[neighbor] = True
                     previous[neighbor] = v
                     if neighbor == goal:
                         leave = True
@@ -351,25 +347,10 @@ class Network:
             return None
         
         path = [goal]
-
         while previous[path[-1]] != None:
             path.append(previous[path[-1]])
 
         return path[::-1]
-
-        queue = [(start, [start])]
-        while queue:
-            (node, path) = queue.pop(0)
-            if self.nodes[node]-set(path) != set():
-                for next in self.nodes[node]-set(path):
-                    if next == set():
-                        continue
-                    if next == goal:
-                        return path + [next]
-                    else:
-                        queue.append((next, path + [next]))
-            else:
-                break
     
     def ShortestPaths(self, start):
         """ Distances and shortest paths from start to the other nodes """
@@ -602,7 +583,7 @@ class Network:
         iterations = 50
         for i in range(iterations):
             
-            print(str(i/iterations*100)+"%\r")
+            print(str(i/iterations*100)+"%", end='\r')
             for node in self.nodes:
                 x = positions[node][0]
                 y = positions[node][1]
