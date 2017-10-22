@@ -726,14 +726,12 @@ class Network:
         if self.isDirected:
             for n in self.nodes:
                 for v in self.nodes[n]:
-                    #self._DrawLink(positions[n],positions[v], ax)
                     self._DrawArrow(positions[n], positions[v], ax)
         else:
             for n in self.nodes:
                 for v in self.nodes[n]:
                     self._DrawLink(positions[n],positions[v], ax)
-                    #self._DrawArrow(positions[n], positions[v], ax)
-        print("Links drawn in "+str(time.clock() - t)+" seconds.")
+        print("Links drawn in " + str(time.clock() - t) + " seconds.")
 
         maxFltr = 1e-6
         fltr = {}
@@ -761,9 +759,6 @@ class Network:
         ax.tick_params(axis='both', which='both', bottom='off', top='off', labelbottom='off', right='off', left='off', labelleft='off')
         plt.axis('scaled')
         plt.show()
-
-
-
 
     def _DrawNode(self, x, y, radius = 0.1, color = (0.960784, 0.968627, 0.886275)):
         node = plt.Circle((x, y), radius = radius, color = color)
