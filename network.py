@@ -13,7 +13,7 @@ class Network:
     def __init__(self):
         self.nodes = defaultdict(set)
         self.isDirected = False
-        self.setSeed()
+        #self.setSeed()
 
     def setSeed(self, s = 42):
         np.random.seed(s)
@@ -130,12 +130,12 @@ class Network:
         t = time.clock() - t
         print("WS random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
-    def BA_Random(self, N, initialNetwork = None):
+    def BA_Random(self, N, k=1, initialNetwork = None):
         """ Generates a BA random network (scale-free) with N nodes, starting with initialNetwork.
         If initialNetwork is not provided, start with [[0,1],[1,2]]. """
         self.isDirected = False
         t = time.clock()
-        print("Creating a BS random network with N={} nodes.".format(N))
+        print("Creating a BA random network with N={} nodes.".format(N))
 
         if initialNetwork==None:
             self.Init([[0,1],[1,2]])
@@ -144,25 +144,26 @@ class Network:
 
         N0 = self.NodeCount()
 
-        for n in range(N-N0):
+        for n in range(N0,N):
             normalization = sum([self.Degree(node) for node in self.nodes])
             #print("normalization="+str(normalization))
 
             degrees = [ self.Degree(v)/normalization for v in self.nodes ]
-            choices = list(random.choices(list(self.nodes.keys()), weights=degrees))
+            choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
+            
             #print("degrees="+str(degrees))
-            #print("choices="+str(choices))
+            print("choices for node{}=".format(n)+str(choices))
             #print()
 
-            self.nodes[n + N0]=set()
+            self.nodes[n]=set()
             for c in choices:
                 self.nodes[n].add(c)
-                self.nodes[c].add(n)
-
+                #self.nodes[c].add(n)
+            print(self.NodeCount())
 
 
         t = time.clock() - t
-        print("BS random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+        print("BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
 
 
