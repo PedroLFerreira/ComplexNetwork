@@ -2,6 +2,6 @@ from network import Network
 
 net = Network()
 
-net.BA_Random(N=500)
+net.BA_Random(N=1000)
 
-net.DegreeDistribution(loglogscale = True)
+net.DegreeDistribution(loglogscale = True, cum=True)
