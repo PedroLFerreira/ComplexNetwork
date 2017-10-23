@@ -7,7 +7,7 @@ import network as nt
 net = Network()
 
 #net.CircularGraph(19, 1)
-net.ER_Random(V=20, p=0.2)
+net.ER_Random(V=20, p=0.2, isDirected=True)
 #net.Init([[1,0], [2,0], [3,0], [4,0], [5,0], [0,1], [0,2], [0,3], [0,4], [0,5]])
 net.ShowNodes()
 
@@ -34,4 +34,4 @@ for key in net.nodes:
 print('average lengh: ', net.AveragePathLenght())
 
 print(net.ClosenessCentrality())
-net.DrawNetwork()
+net.DrawNetwork(useForce = True, forceIterations = 100, drawNodeNames=True)
