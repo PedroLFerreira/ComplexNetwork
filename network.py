@@ -473,6 +473,7 @@ class Network:
 
     def Lattice(self, shape, periodic=False):
         """ create a regular lattice network """
+        self.isDirected = False
 
         nodeSizes = [1]
         for side in shape:
@@ -483,11 +484,13 @@ class Network:
         for i in range(nodeSizes[-1]):
             for (gap, size) in zip(nodeSizes, shape):
                 if (i // gap) % size != size-1:
-                    self.nodes[i].add(i+gap)
-                    self.nodes[i+gap].add(i)
+                    self.AddEdge(i, i+gap)
+                    #self.nodes[i].add(i+gap)
+                    #self.nodes[i+gap].add(i)
                 elif periodic:
-                    self.nodes[i].add(i-gap*(size-1))
-                    self.nodes[i-gap*(size-1)].add(i)
+                    self.AddEdge(i, i-gap*(size-1))
+                    #self.nodes[i].add(i-gap*(size-1))
+                    #self.nodes[i-gap*(size-1)].add(i)
 
     def CircularGraph(self, n, k):
         """ create a circular graph 
@@ -495,16 +498,20 @@ class Network:
             network generated will be <k>=2k
         """
 
+        self.isDirected = False
+
         self.nodes = defaultdict(set)
         
         for i in range(n):
             for j in range(1, k+1):
                 if i+j > n-1:
-                    self.nodes[i].add(i+j-n)
-                    self.nodes[i+j-n].add(i)
+                    self.AddEdge(i, i+j-n)
+                    #self.nodes[i].add(i+j-n)
+                    #self.nodes[i+j-n].add(i)
                 else:
-                    self.nodes[i].add(i+j)
-                    self.nodes[i+j].add(i)
+                    self.AddEdge(i, i+j)
+                    #self.nodes[i].add(i+j)
+                    #self.nodes[i+j].add(i)
 
     def ClosenessCentrality(self, node=None):
         """ Calculate the closeness centrality for a given node.
