@@ -6,12 +6,12 @@ from collections import defaultdict
 
 
 net = Network()
-net.BA_Random(100)
+net.WS_Random(100, 1, 0.2)
 
 sfltr = [None]*net.NodeCount()
 for node in net.nodes:
     sfltr[node] = net.Degree(node)
-sfltr = [sfltr[n]/max(sfltr)*0.1+0.05 for n in net.nodes]
+sfltr = [sfltr[n]/max(sfltr)*0.01+0.05 for n in net.nodes]
 
 #cfltr = [None]*net.NodeCount()
 #for node in net.nodes:
@@ -21,7 +21,7 @@ cfltr = net.BetweennessCentrality()
 maxFilter= max(cfltr.values())
 cfltr = [cfltr[n]/maxFilter for n in net.nodes]
 
-net.DrawNetwork(useForce=True, forceIterations = 10, colorFilter = cfltr, sizeFilter = sfltr)
+net.DrawNetwork(useForce=True, drawNodeNames = False, forceIterations = 10, colorFilter = cfltr, sizeFilter = sfltr)
 
 net.DegreeDistribution(showPlot = False, loglogscale = True)
 
