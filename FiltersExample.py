@@ -6,18 +6,18 @@ from collections import defaultdict
 
 
 net = Network()
-net.WS_Random(100, 1, 0.2)
+net.BA_Random(100)
 
 sfltr = [None]*net.NodeCount()
 for node in net.nodes:
     sfltr[node] = net.Degree(node)
-sfltr = [sfltr[n]/max(sfltr)*0.01+0.05 for n in net.nodes]
+sfltr = [sfltr[n]/max(sfltr)*0.09+0.02 for n in net.nodes]
 
 #cfltr = [None]*net.NodeCount()
 #for node in net.nodes:
 #    cfltr[node] = net.HarmonicCentrality(node)
 
-cfltr = net.BetweennessCentrality()
+cfltr = net.HarmonicCentrality()
 maxFilter= max(cfltr.values())
 cfltr = [cfltr[n]/maxFilter for n in net.nodes]
 
