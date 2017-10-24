@@ -103,30 +103,16 @@ class Network:
         t = time.clock()
         print("Creating a WS random network with N={} nodes, K={} initial neighbors and relink probability beta={}.".format(N, K, beta))
         self.CircularGraph(N, K)
-        #print(self.nodes)
 
         for n in self.nodes:
             buffer = self.nodes[n].copy()
-            #print("n={}".format(n))
             for v in buffer:
-                #print("   v={}".format(v))
                 if random.uniform(0,1) < beta:
                     r = random.choice(list(self.nodes.keys()-buffer-{v,n}))
-                    #print("      r={}".format(r))
-                    #print("        Before:")
-                    #print("          node n:"+str(self.nodes[n]))
-                    #print("          node v:"+str(self.nodes[v]))
-                    #print("          node r:"+str(self.nodes[r]))
-                    #print()
                     self.nodes[n].remove(v)
                     self.nodes[v].remove(n)
                     self.nodes[n].add(r)
                     self.nodes[r].add(n)
-                    #print("        After:")
-                    #print("          node n:"+str(self.nodes[n]))
-                    #print("          node v:"+str(self.nodes[v]))
-                    #print("          node r:"+str(self.nodes[r]))
-        #print(self.nodes)
         t = time.clock() - t
         print("WS random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
@@ -143,29 +129,17 @@ class Network:
             self.Init(initialNetwork)
 
         N0 = self.NodeCount()
-
         for n in range(N0,N):
+            print("{:.3}%".format(n/N*100),end='\r')
             normalization = sum([self.Degree(node) for node in self.nodes])
-            #print("normalization="+str(normalization))
-
             degrees = [ self.Degree(v)/normalization for v in self.nodes ]
             choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
-            
-            #print("degrees="+str(degrees))
-            print("choices for node{}=".format(n)+str(choices))
-            #print()
-
             self.nodes[n]=set()
             for c in choices:
-                self.nodes[n].add(c)
-                #self.nodes[c].add(n)
-            print(self.NodeCount())
-
+                self.AddEdge(n,c)
 
         t = time.clock() - t
         print("BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
-
-
 
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. """
@@ -227,7 +201,9 @@ class Network:
         for d in range(0, len(distribution)):
             distribution[d] = distribution[d] / normalization
         if showPlot:
-            ax = plt.plot(range(0,len(distribution)), distribution)
+            ax = plt.scatter(range(0,len(distribution)), distribution)
+            plt.xlim(1,1e3)
+            plt.ylim(1e-4,1)
             if loglogscale:
                 plt.xscale('log')
                 plt.yscale('log')
@@ -730,6 +706,7 @@ class Network:
             print("Force-based layout algorithm finished in "+str(time.clock() - t)+" seconds.")
             
         print("Drawing links...")
+        print(self.nodes)
         t = time.clock()
         if self.isDirected:
             for n in self.nodes:
