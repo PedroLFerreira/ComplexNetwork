@@ -197,7 +197,7 @@ class Network:
         for node in self.nodes:
             degree = self.Degree(node)
             distribution[degree] += 1
-        normalization = 1#sum(distribution)
+        normalization = sum(distribution)
         for d in range(0, len(distribution)):
             distribution[d] = distribution[d] / normalization
         if showPlot:
