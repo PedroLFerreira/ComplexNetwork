@@ -130,7 +130,7 @@ class Network:
 
         N0 = self.NodeCount()
         for n in range(N0,N):
-            print("{:.3}%".format(n/N*100),end='\r')
+            print("   {:.3}%".format(n/N*100),end='\r')
             normalization = sum([self.Degree(node) for node in self.nodes])
             degrees = [ self.Degree(v)/normalization for v in self.nodes ]
             choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
@@ -186,9 +186,7 @@ class Network:
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
-    def DegreeDistribution(self, showPlot = True,
-                                 loglogscale = False,
-                                 cum = False):
+    def DegreeDistribution(self, showPlot = True, loglogscale = False):
         """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
@@ -199,33 +197,22 @@ class Network:
         for node in self.nodes:
             degree = self.Degree(node)
             distribution[degree] += 1
-        normalization = sum(distribution)
-        if cum:
-            distribution[0] /= normalization
-            for d in range(1, len(distribution)):
-                distribution[d] = (distribution[d] + distribution[d-1]) / normalization
-        else:
-            for d in range(0, len(distribution)):
-                distribution[d] = distribution[d] / normalization
+        normalization = 1#sum(distribution)
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
         if showPlot:
             ax = plt.scatter(range(0,len(distribution)), distribution)
-<<<<<<< HEAD
             plt.xlim(1,1e3)
             plt.ylim(1e-4,1)
-=======
->>>>>>> fde463c89ea07730fcb9000d7c08eaa88a4f8e77
             if loglogscale:
                 plt.xscale('log')
                 plt.yscale('log')
-            plt.xlim(1, maxDegree)
-            plt.ylim(1/len(self.nodes), 1)
             plt.xlabel("Degree")
             plt.ylabel("Fraction of Nodes")
             plt.show()
 
         return distribution
-
-
+    
     def InDegreeDistribution(self):
         maxDegree = 0
         for node in self.nodes:
