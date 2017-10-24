@@ -190,7 +190,7 @@ class Network:
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
-    def DegreeDistribution(self, showPlot = True, loglogscale = False, cum = True):
+    def DegreeDistribution(self, showPlot = True, loglogscale = False, cum = False):
         """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
