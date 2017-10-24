@@ -8,7 +8,7 @@ import matplotlib.lines as mlines
 Net = Network()
 Net.setSeed(50)
 
-N=1000
+N=10000
 x = np.linspace(0,0.01,100)
 y = []
 for p in x:
