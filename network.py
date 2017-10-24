@@ -136,15 +136,7 @@ class Network:
             choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
             self.nodes[n]=set()
             for c in choices:
-<<<<<<< HEAD
-                self.AddEdge(n, c)
-                #self.nodes[n].add(c)
-                #self.nodes[c].add(n)
-            print(self.NodeCount())
-
-=======
                 self.AddEdge(n,c)
->>>>>>> bd2e10cb979cfc84f784fcce4b2a37c0e7bfdeef
 
         t = time.clock() - t
         print("BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
@@ -198,7 +190,7 @@ class Network:
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
-    def DegreeDistribution(self, showPlot = True, loglogscale = False):
+    def DegreeDistribution(self, showPlot = True, loglogscale = False, cum = True):
         """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
@@ -210,7 +202,6 @@ class Network:
             degree = self.Degree(node)
             distribution[degree] += 1
         normalization = sum(distribution)
-<<<<<<< HEAD
         if cum:
             distribution[0] /= normalization
             for d in range(1, len(distribution)):
@@ -218,10 +209,6 @@ class Network:
         else:
             for d in range(0, len(distribution)):
                 distribution[d] = distribution[d] / normalization
-=======
-        for d in range(0, len(distribution)):
-            distribution[d] = distribution[d] / normalization
->>>>>>> bd2e10cb979cfc84f784fcce4b2a37c0e7bfdeef
         if showPlot:
             ax = plt.scatter(range(0,len(distribution)), distribution)
             plt.xlim(1,1e3)

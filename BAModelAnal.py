@@ -23,11 +23,6 @@ plt.show()
 
 net = Network()
 
-<<<<<<< HEAD
-net.BA_Random(N=20)
-
-net.DrawNetwork(useForce = True)
-=======
 net.BA_Random(N=1000)
 ddist = net.DegreeDistribution(loglogscale = False)
 
@@ -40,7 +35,6 @@ x = np.linspace(0, len(ddist), num=len(ddist))
 x = x[1:]
 print(ddist)
 y = ddist[1:]
->>>>>>> bd2e10cb979cfc84f784fcce4b2a37c0e7bfdeef
 
 print(x)
 print(len(x))
