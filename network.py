@@ -70,31 +70,31 @@ class Network:
                     self.nodes[edge[0]] = set()
 
 
-    def ER_Random(self, V, p, isDirected=False):
-        """ Generates a ER random network with V vertices and probability p of edge occurrence. """
+    def ER_Random(self, N, p, isDirected=False):
+        """ Generates a ER random network with N vertices and probability p of edge occurrence. """
         self.isDirected = isDirected
         t = time.clock()
-        print("Creating a ER random network with V={} nodes and edge probability p={}.".format(V, p))
-        for n in range(V):
+        print("Creating a ER random network with N={} nodes and edge probability p={}.".format(N, p))
+        for n in range(N):
             self.nodes[n] = set()
-            if((n+1)%(V/100)==0):
-                print("      Node Progress: {:.1f}%".format((n+1)/V*100))
+            if((n+1)%(N/100)==0):
+                print("      Node Progress: {:.1f}%".format((n+1)/N*100), end='\r')
         
         if not self.isDirected:
-            for n in range(V):
-                for v in range(n,V):
+            for n in range(N):
+                for v in range(n,N):
                     if(v != n and random.uniform(0,1) < p):
                         self.AddEdge(v, n)
                         self.AddEdge(n, v)
-                if((n+1)%(V/100)==0):
-                    print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
+                if((n+1)%(N/100)==0):
+                    print("      Edge Progress: {:.1f}%\r".format((n+1)/N*100), end='\r')
         else:
-            for n in range(V):
-                for v in range(V):
+            for n in range(N):
+                for v in range(N):
                     if(v != n and random.uniform(0,1) < p):
                         self.AddEdge(v, n)
-                if((n+1)%(V/100)==0):
-                    print("      Edge Progress: {:.1f}%\r".format((n+1)/V*100))
+                if((n+1)%(N/100)==0):
+                    print("      Edge Progress: {:.1f}%\r".format((n+1)/N*100), end='\r')
         t = time.clock() - t
         print("ER random Network with {} nodes created in {:.3f} seconds.".format(self.NodeCount(),t))
 
@@ -218,8 +218,10 @@ class Network:
             if loglogscale:
                 plt.xscale('log')
                 plt.yscale('log')
-            plt.xlabel("Degree")
-            plt.ylabel("Fraction of Nodes")
+            plt.xlim(0, maxDegree)
+            plt.ylim(0, 1)
+            plt.xlabel("k")
+            plt.ylabel("P(k)")
             plt.show()
 
         return distribution
@@ -335,9 +337,9 @@ class Network:
 
     def Density(self):
         """ Computes the density of the network """
-        V = self.NodeCount()
+        N = self.NodeCount()
         E = self.EdgeCount()
-        return 2*(E - V + 1)/(V*(V - 3) + 2)
+        return 2*(E - N + 1)/(N*(N - 3) + 2)
     
     def ConnectedComponent(self, start):
         """ Using BFS algorithm, returns set of nodes  """
