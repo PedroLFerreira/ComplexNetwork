@@ -29,8 +29,6 @@ ddist = net.DegreeDistribution(loglogscale = False)
 #def powerLaw(k, gamma):
 #    return k**(-gamma)
 
-
-
 x = np.linspace(0, len(ddist), num=len(ddist))
 x = x[1:]
 print(ddist)
