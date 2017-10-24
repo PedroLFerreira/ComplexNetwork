@@ -6,6 +6,10 @@ import network as nt
 
 net = Network()
 
+net.CompleteGraph(6)
+
+net.DrawNetwork(useForce=True)
+
 #net.CircularGraph(19, 1)
 net.ER_Random(V=20, p=0.2, isDirected=True)
 #net.Init([[1,0], [2,0], [3,0], [4,0], [5,0], [0,1], [0,2], [0,3], [0,4], [0,5]])

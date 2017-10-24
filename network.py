@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as clrs
 from collections import defaultdict, deque
+from itertools import accumulate
 import random
 import time
 import numpy as np
@@ -124,14 +125,15 @@ class Network:
         print("Creating a BA random network with N={} nodes.".format(N))
 
         if initialNetwork==None:
-            self.Init([[0,1],[1,2]], isDirected = False)
+            self.CompleteGraph(k+1)
+            #self.Init([[0,1],[1,2]], isDirected = False)
         else:
             self.Init(initialNetwork, isDirected = False)
 
         N0 = self.NodeCount()
         for n in range(N0,N):
-            print("   {:.3}%".format(n/N*100),end='\r')
-            normalization = sum([self.Degree(node) for node in self.nodes])
+            print("   {:8.3}%".format((n/N)**2*100),end='\r')
+            normalization = 1#sum([self.Degree(node) for node in self.nodes])
             degrees = [ self.Degree(v)/normalization for v in self.nodes ]
             choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
             self.nodes[n]=set()
@@ -202,13 +204,13 @@ class Network:
             degree = self.Degree(node)
             distribution[degree] += 1
         normalization = sum(distribution)
+
+        for d in range(0, len(distribution)):
+            distribution[d] = distribution[d] / normalization
+        
         if cum:
-            distribution[0] /= normalization
-            for d in range(1, len(distribution)):
-                distribution[d] = (distribution[d] + distribution[d-1] * normalization) / normalization
-        else:
-            for d in range(0, len(distribution)):
-                distribution[d] = distribution[d] / normalization
+            distribution = list(accumulate(distribution[::-1]))[::-1]
+
         if showPlot:
             ax = plt.scatter(range(0,len(distribution)), distribution)
             plt.xlim(1,1e3)
@@ -498,6 +500,17 @@ class Network:
                     self.AddEdge(i, i+j)
                     #self.nodes[i].add(i+j)
                     #self.nodes[i+j].add(i)
+
+    def CompleteGraph(self, n):
+        """ create a fully conected graph"""
+
+        self.isDirected = False
+
+        self.nodes = defaultdict(set)
+
+        for i in range(n):
+            for j in range(i, n):
+                self.AddEdge(i, j)
 
     def ClosenessCentrality(self, node=None):
         """ Calculate the closeness centrality for a given node.
