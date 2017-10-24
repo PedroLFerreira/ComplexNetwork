@@ -138,9 +138,9 @@ class Network:
         print("Creating a BA random network with N={} nodes.".format(N))
 
         if initialNetwork==None:
-            self.Init([[0,1],[1,2]])
+            self.Init([[0,1],[1,2]], isDirected = False)
         else:
-            self.Init(initialNetwork)
+            self.Init(initialNetwork, isDirected = False)
 
         N0 = self.NodeCount()
 
@@ -157,7 +157,8 @@ class Network:
 
             self.nodes[n]=set()
             for c in choices:
-                self.nodes[n].add(c)
+                self.AddEdge(n, c)
+                #self.nodes[n].add(c)
                 #self.nodes[c].add(n)
             print(self.NodeCount())
 
@@ -182,9 +183,13 @@ class Network:
 
     def Degree(self, node):
         """ Computes the degree of the node. """
-        if node in self.nodes:
-            return len(self.nodes[node])
-        return None
+        if self.isDirected:
+            return self.OutDegree(node) + self.InDegree(node)
+        else:
+            return self.OutDegree(node)
+        #if node in self.nodes:
+        #    return len(self.nodes[node])
+        #return None
 
     def OutDegree(self, node):
         """ Computes the out-degree of the node. """
@@ -229,7 +234,7 @@ class Network:
         if cum:
             distribution[0] /= normalization
             for d in range(1, len(distribution)):
-                distribution[d] = (distribution[d] + distribution[d-1]) / normalization
+                distribution[d] = (distribution[d] + distribution[d-1] * normalization) / normalization
         else:
             for d in range(0, len(distribution)):
                 distribution[d] = distribution[d] / normalization
@@ -364,6 +369,7 @@ class Network:
     
     def ConnectedComponent(self, start):
         """ Using BFS algorithm, returns set of nodes  """
+        # maybe use a deque instead of a list dor the queue
         visited, queue = set(), [start]
         while queue:
             node = queue.pop(0)
