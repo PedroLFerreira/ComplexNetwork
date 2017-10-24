@@ -124,9 +124,9 @@ class Network:
         print("Creating a BA random network with N={} nodes.".format(N))
 
         if initialNetwork==None:
-            self.Init([[0,1],[1,2]])
+            self.Init([[0,1],[1,2]], isDirected = False)
         else:
-            self.Init(initialNetwork)
+            self.Init(initialNetwork, isDirected = False)
 
         N0 = self.NodeCount()
         for n in range(N0,N):
@@ -156,9 +156,13 @@ class Network:
 
     def Degree(self, node):
         """ Computes the degree of the node. """
-        if node in self.nodes:
-            return len(self.nodes[node])
-        return None
+        if self.isDirected:
+            return self.OutDegree(node) + self.InDegree(node)
+        else:
+            return self.OutDegree(node)
+        #if node in self.nodes:
+        #    return len(self.nodes[node])
+        #return None
 
     def OutDegree(self, node):
         """ Computes the out-degree of the node. """
@@ -186,7 +190,7 @@ class Network:
     def AvDegree(self):
         return 2*self.EdgeCount()/self.NodeCount()
 
-    def DegreeDistribution(self, showPlot = True, loglogscale = False):
+    def DegreeDistribution(self, showPlot = True, loglogscale = False, cum = False):
         """ Computes the degree distribution of the network and draws the plot. """
         maxDegree = 0
         for node in self.nodes:
@@ -198,8 +202,13 @@ class Network:
             degree = self.Degree(node)
             distribution[degree] += 1
         normalization = sum(distribution)
-        for d in range(0, len(distribution)):
-            distribution[d] = distribution[d] / normalization
+        if cum:
+            distribution[0] /= normalization
+            for d in range(1, len(distribution)):
+                distribution[d] = (distribution[d] + distribution[d-1] * normalization) / normalization
+        else:
+            for d in range(0, len(distribution)):
+                distribution[d] = distribution[d] / normalization
         if showPlot:
             ax = plt.scatter(range(0,len(distribution)), distribution)
             plt.xlim(1,1e3)
@@ -332,6 +341,7 @@ class Network:
     
     def ConnectedComponent(self, start):
         """ Using BFS algorithm, returns set of nodes  """
+        # maybe use a deque instead of a list dor the queue
         visited, queue = set(), [start]
         while queue:
             node = queue.pop(0)
