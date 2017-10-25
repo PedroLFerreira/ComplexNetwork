@@ -16,7 +16,7 @@ net = Network()
 
 c = 6
 
-net.BA_Random(N=5000, k=c, initialNetwork=[[0,1],[1,2],[2,0]])
+net.BA_Random(N=500, k=c)
 ddist = net.DegreeDistribution(loglogscale = False, cum = True)
 
 #def powerLaw(k, gamma):
@@ -43,3 +43,20 @@ ax.text(50, .1, "$\\gamma={:.3f}$\n$a={:.3f}$".format(popt[0], popt[1]), fontsiz
 plt.savefig('BApowerlog.pdf')
 plt.show()
 
+b = net.BetweennessCentrality()
+d = dict(((key, net.Degree(key)) for key in net.nodes))
+
+bv, dv = [], []
+for key in net.nodes:
+    bv.append(b[key])
+    dv.append(d[key])
+
+print(min(dv))
+
+plt.scatter(dv, bv)
+plt.ylabel('betweenness centrality')
+plt.xlabel('degree')
+plt.xscale('log')
+plt.show()
+
+print(b, d)
