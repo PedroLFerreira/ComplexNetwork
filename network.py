@@ -148,6 +148,40 @@ class Network:
         t = time.clock() - t
         print("BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
+    def ModifiedBA_Random(self, N, k=1, initialNetwork = None, PAFunction=None):
+        """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
+        If initialNetwork is not provided, start with [[0,1],[1,2]]. """
+        self.isDirected = False
+        t = time.clock()
+        print("Creating a modified BA random network with N={} nodes.".format(N))
+
+        if initialNetwork==None:
+            self.CompleteGraph(k+2)
+            #self.Init([[0,1],[1,2]], isDirected = False)
+        else:
+            self.Init(initialNetwork, isDirected = False)
+
+        N0 = self.NodeCount()
+        for n in range(N0,N):
+            print("   {:8.3}%".format((n/N)**2*100),end='\r')
+            if PAFunction is None:
+                normalization = 1#sum([self.Degree(node) for node in self.nodes])
+                prefAttachment = [ self.Degree(v)/normalization for v in self.nodes ]
+            else:
+                prefAttachment = PAFunction()
+                prefAttachment = [ p + 1 for p in prefAttachment]
+            choices = list(random.choices(list(self.nodes.keys()), weights=prefAttachment, k=k))
+            self.nodes[n]=set()
+            for c in choices:
+                self.AddEdge(n,c)
+
+        t = time.clock() - t
+        print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+
+
+
+
+
     def AddEdge(self, fromNode, toNode):
         """ Adds an edge between fromNode to toNode. """
         self.nodes[fromNode].add(toNode)
@@ -218,13 +252,15 @@ class Network:
 
         if showPlot:
             ax = plt.scatter(range(0,len(distribution)), distribution)
-            plt.xlim(1,1e3)
-            plt.ylim(1e-4,1)
+            
             if loglogscale:
+                plt.xlim(1e-1, math.log(maxDegree)*100)
+                plt.ylim(1e-3, 1)
                 plt.xscale('log')
                 plt.yscale('log')
-            plt.xlim(0, maxDegree)
-            plt.ylim(0, 1)
+            else:
+                plt.xlim(0, maxDegree)
+                plt.ylim(0, 1)
             plt.xlabel("k")
             plt.ylabel("P(k)")
             plt.show()
