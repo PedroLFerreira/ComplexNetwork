@@ -37,7 +37,7 @@ degs1 = [ d/maxD for d in degs1 ]
 degs2 = [ d/maxD for d in degs2 ]
 degs3 = [ d/maxD for d in degs3 ]
 
-#Net0.DrawNetwork(useForce=True, colorFilter = degs0)
-#Net1.DrawNetwork(useForce=True, colorFilter = degs1)
+Net0.DrawNetwork(useForce=True, colorFilter = degs0)
+Net1.DrawNetwork(useForce=True, colorFilter = degs1)
 Net2.DrawNetwork(useForce=True, colorFilter = degs2)
 Net3.DrawNetwork(useForce=True, colorFilter = degs3)
