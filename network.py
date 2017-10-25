@@ -133,9 +133,14 @@ class Network:
         N0 = self.NodeCount()
         for n in range(N0,N):
             print("   {:8.3}%".format((n/N)**2*100),end='\r')
-            normalization = 1#sum([self.Degree(node) for node in self.nodes])
-            degrees = [ self.Degree(v)/normalization for v in self.nodes ]
-            choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
+            degrees = dict(((key, self.Degree(key)) for key in self.nodes))
+            choices = []
+            for _ in range(k):
+                choices.extend(random.choices(list(degrees.keys()), weights=list(degrees.values())))
+                degrees.pop(choices[-1])
+            #normalization = 1#sum([self.Degree(node) for node in self.nodes])
+            #degrees = [ self.Degree(v)/normalization for v in self.nodes ]
+            #choices = list(random.choices(list(self.nodes.keys()), weights=degrees, k=k))
             self.nodes[n]=set()
             for c in choices:
                 self.AddEdge(n,c)
