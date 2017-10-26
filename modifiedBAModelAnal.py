@@ -23,17 +23,21 @@ distributions = []
 x = np.linspace(0, 1, 2)
 for alpha in x:
     #temp = []
-    #for iteration in range(5):
-    net.ModifiedBA_Random22(n, m, alpha=alpha)
+    #for iteration in range(10):
+    net.ModifiedBA_Random(n, m, alpha=alpha)
     ddist = net.DegreeDistribution(showPlot=False, cum=True)
-    #temp.append(net.AvClusteringCoefficient())
+        #temp.append(net.AvClusteringCoefficient())
     distributions.append(ddist)
     #CC.append(sum(temp)/len(temp))
     #CCerror.append(np.std(temp)/len(temp))
 
 degrees = np.arange(0, max(map(len, distributions)), dtype=float)
-#plt.errorbar(x, CC, yerr=CCerror)
-#plt.show()
+# plt.plot(x, CC, '-o')
+# plt.xlabel(r'$\alpha$')
+# plt.ylabel('clustering coefficient')
+# plt.savefig('CCmodifiedBA.pdf')
+# plt.show()
+
 
 plt.xscale('log')
 plt.yscale('log')
@@ -44,8 +48,8 @@ plt2 = plt.plot(degrees[m:len(distributions[1])], distributions[1][m:], '-o', la
 plt.xlabel('k')
 plt.ylabel('comulative probability')
 plt.legend()
-plt.show()
 plt.savefig('distributionModified.pdf')
+plt.show()
 
 # c = 2
 
