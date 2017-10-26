@@ -119,7 +119,7 @@ class Network:
 
     def BA_Random(self, N, k=1, initialNetwork = None):
         """ Generates a BA random network (scale-free) with N nodes, starting with initialNetwork.
-        If initialNetwork is not provided, start with [[0,1],[1,2]]. """
+        If initialNetwork is not provided, start with complete graph of k+1 nodes. """
         self.isDirected = False
         t = time.clock()
         print("Creating a BA random network with N={} nodes.".format(N))
@@ -150,7 +150,7 @@ class Network:
 
     def ModifiedBA_Random(self, N, k=1, initialNetwork = None, PAFunction=None):
         """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
-        If initialNetwork is not provided, start with [[0,1],[1,2]]. """
+        If initialNetwork is not provided, start with a complete graph of k+1 nodes. """
         self.isDirected = False
         t = time.clock()
         print("Creating a modified BA random network with N={} nodes.".format(N))
@@ -178,7 +178,44 @@ class Network:
         t = time.clock() - t
         print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
+    def ModifiedBA_Random22(self, N, k=2, initialNetwork = None):
+        """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
+        If initialNetwork is not provided, start with a complete graph of k+1 nodes. """
+        self.isDirected = False
+        t = time.clock()
+        print("Creating a modified BA random network with N={} nodes.".format(N))
 
+        if initialNetwork == None:
+            self.CompleteGraph(k+2)
+        else:
+            self.Init(initialNetwork, isDirected = False)
+
+        N0 = self.NodeCount()
+        for n in range(N0,N):
+            print("   {:8.3}%".format((n/N)**2*100),end='\r')
+        
+            degrees = dict(((key, self.Degree(key)) for key in self.nodes))
+            possible = set()
+            choices = []
+            for newN in range(k):
+                if newN == 0:
+                    choices.extend(random.choices(list(degrees.keys()), weights=list(degrees.values())))
+                else:
+                    possible = possible | self.nodes[choices[-1]]
+                    for c in choices:
+                        if c in possible:
+                            possible.remove(c)
+                    toBePicked = {key: degrees[key] for key in possible}
+                    choices.extend(random.choices(list(toBePicked.keys()), weights=list(toBePicked.values())))
+
+
+            #choices = list(random.choices(list(self.nodes.keys()), weights=prefAttachment, k=k))
+            self.nodes[n]=set()
+            for c in choices:
+                self.AddEdge(n,c)
+
+        t = time.clock() - t
+        print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
 
 
@@ -491,7 +528,7 @@ class Network:
                     coefficient += 1
         l = len(self.nodes[node])
         if l > 1:
-            coefficient /= (l * (l - 1))
+            coefficient /= 2*(l * (l - 1))
         
         return coefficient
 
