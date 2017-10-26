@@ -14,10 +14,10 @@ def distribution(n, k):
 
 net = Network()
 
-c = 6
+c = 2
 
 n=100
-net.ModifiedBA_Random22(N=n, k=c)#, initialNetwork = [[0,1], [1,2], [2,0]])
+net.ModifiedBA_Random22(N=n, k=c, alpha=0)#, initialNetwork = [[0,1], [1,2], [2,0]])
 ddist = net.DegreeDistribution(loglogscale = False, cum = True, showPlot = False)
 
 x = np.arange(0, len(ddist), dtype=float)

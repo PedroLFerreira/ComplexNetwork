@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import math
 import random
 
-random.seed(9)
+#random.seed(9)
 
 powerLaw = lambda k, g, a: a*k**-(g-1)
 
@@ -14,9 +14,9 @@ def distribution(n, k):
 
 net = Network()
 
-c = 6
+c = 2
 
-n=1000
+n=100
 net.BA_Random(N=n, k=c)#, initialNetwork = [[0,1], [1,2], [2,0]])
 ddist = net.DegreeDistribution(loglogscale = False, cum = True, showPlot = False)
 
@@ -54,3 +54,5 @@ plt.ylabel('betweenness centrality')
 plt.xlabel('degree')
 plt.xscale('log')
 plt.show()
+
+print(net.AvClusteringCoefficient())

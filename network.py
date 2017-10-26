@@ -178,7 +178,7 @@ class Network:
         t = time.clock() - t
         print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
-    def ModifiedBA_Random22(self, N, k=2, initialNetwork = None):
+    def ModifiedBA_Random22(self, N, k=2, alpha=1, initialNetwork = None):
         """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
         If initialNetwork is not provided, start with a complete graph of k+1 nodes. """
         self.isDirected = False
@@ -194,7 +194,7 @@ class Network:
         for n in range(N0,N):
             print("   {:8.3}%".format((n/N)**2*100),end='\r')
         
-            degrees = dict(((key, self.Degree(key)) for key in self.nodes))
+            degrees = {key: self.Degree(key) for key in self.nodes}
             possible = set()
             choices = []
             for newN in range(k):
@@ -205,8 +205,13 @@ class Network:
                     for c in choices:
                         if c in possible:
                             possible.remove(c)
-                    toBePicked = {key: degrees[key] for key in possible}
-                    choices.extend(random.choices(list(toBePicked.keys()), weights=list(toBePicked.values())))
+                    
+                    newDegrees = degrees.copy()
+                    for key in self.nodes:
+                        if key not in possible:
+                            newDegrees[key] *= (1-alpha)
+                        
+                    choices.extend(random.choices(list(newDegrees.keys()), weights=list(newDegrees.values())))
 
 
             #choices = list(random.choices(list(self.nodes.keys()), weights=prefAttachment, k=k))
