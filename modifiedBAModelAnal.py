@@ -15,23 +15,37 @@ def distribution(n, k):
 net = Network()
 
 m=2
-n=500
+n=5000
 
 CC = []
 CCerror = []
-x = np.linspace(0, 1, 10)
+distributions = []
+x = np.linspace(0, 1, 2)
 for alpha in x:
-    temp = []
-    for iteration in range(5):
-        net.ModifiedBA_Random22(n, m, alpha=alpha)
-        ddist = net.DegreeDistribution(showPlot=False, cum=True)
-        temp.append(net.AvClusteringCoefficient())
-    
-    CC.append(sum(temp)/len(temp))
-    CCerror.append(np.std(temp)/len(temp))
+    #temp = []
+    #for iteration in range(5):
+    net.ModifiedBA_Random22(n, m, alpha=alpha)
+    ddist = net.DegreeDistribution(showPlot=False, cum=True)
+    #temp.append(net.AvClusteringCoefficient())
+    distributions.append(ddist)
+    #CC.append(sum(temp)/len(temp))
+    #CCerror.append(np.std(temp)/len(temp))
 
-plt.errorbar(x, CC, yerr=CCerror)
+degrees = np.arange(0, max(map(len, distributions)), dtype=float)
+#plt.errorbar(x, CC, yerr=CCerror)
+#plt.show()
+
+plt.xscale('log')
+plt.yscale('log')
+
+plt1 = plt.plot(degrees[m:len(distributions[0])], distributions[0][m:], '-o', label=r'$\alpha = 0$')
+plt2 = plt.plot(degrees[m:len(distributions[1])], distributions[1][m:], '-o', label=r'$\alpha = 1$')
+
+plt.xlabel('k')
+plt.ylabel('comulative probability')
+plt.legend()
 plt.show()
+plt.savefig('distributionModified.pdf')
 
 # c = 2
 
