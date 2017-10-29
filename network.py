@@ -148,35 +148,34 @@ class Network:
         t = time.clock() - t
         print("BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
-    # def ModifiedBA_Random(self, N, k=1, initialNetwork = None, PAFunction=None):
-    #     """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
-    #     If initialNetwork is not provided, start with a complete graph of k+1 nodes. """
-    #     self.isDirected = False
-    #     t = time.clock()
-    #     print("Creating a modified BA random network with N={} nodes.".format(N))
+    def PrefAttachBA_Random(self, N, k=1, initialNetwork = None, PAFunction=None):
+        """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
+        If initialNetwork is not provided, start with a complete graph of k+1 nodes. """
+        self.isDirected = False
+        t = time.clock()
+        print("Creating a modified BA random network with N={} nodes.".format(N))
 
-    #     if initialNetwork==None:
-    #         self.CompleteGraph(k+2)
-    #         #self.Init([[0,1],[1,2]], isDirected = False)
-    #     else:
-    #         self.Init(initialNetwork, isDirected = False)
+        if initialNetwork==None:
+            self.CompleteGraph(k+2)
+            #self.Init([[0,1],[1,2]], isDirected = False)
+        else:
+            self.Init(initialNetwork, isDirected = False)
 
-    #     N0 = self.NodeCount()
-    #     for n in range(N0,N):
-    #         print("   {:8.3}%".format((n/N)**2*100),end='\r')
-    #         if PAFunction is None:
-    #             normalization = 1#sum([self.Degree(node) for node in self.nodes])
-    #             prefAttachment = [ self.Degree(v)/normalization for v in self.nodes ]
-    #         else:
-    #             prefAttachment = PAFunction()
-    #             prefAttachment = [ p + 1 for p in prefAttachment]
-    #         choices = list(random.choices(list(self.nodes.keys()), weights=prefAttachment, k=k))
-    #         self.nodes[n]=set()
-    #         for c in choices:
-    #             self.AddEdge(n,c)
-
-    #     t = time.clock() - t
-    #     print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
+        N0 = self.NodeCount()
+        for n in range(N0,N):
+            print("   {:8.3}%".format((n/N)**2*100),end='\r')
+            if PAFunction is None:
+                normalization = 1#sum([self.Degree(node) for node in self.nodes])
+                prefAttachment = [ self.Degree(v)/normalization for v in self.nodes ]
+            else:
+                prefAttachment = PAFunction()
+                prefAttachment = [ p + 1 for p in prefAttachment]
+            choices = list(random.choices(list(self.nodes.keys()), weights=prefAttachment, k=k))
+            self.nodes[n]=set()
+            for c in choices:
+                self.AddEdge(n,c)
+        t = time.clock() - t
+        print("Modified BA random Network with {} nodes created in {:.3f} seconds.\n".format(N, t))
 
     def ModifiedBA_Random(self, N, k=2, alpha=1, initialNetwork = None):
         """ Generates a modified BA random network (scale-free) with N nodes, starting with initialNetwork.
